@@ -1,0 +1,7 @@
+# Ignore uploaded files
+uploads/
+
+# Node modules and logs
+node_modules/
+npm-debug.log*
+.env

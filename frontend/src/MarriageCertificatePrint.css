@@ -1,0 +1,108 @@
+.certificate-witnesses {
+  margin-top: 22px;
+  padding: 16px 20px;
+  border: 1px solid #d5dee9;
+  background: #fbfcfe;
+}
+
+.certificate-witnesses h2 {
+  margin: 0 0 10px;
+  padding-bottom: 8px;
+  color: #104b9b;
+  border-bottom: 1px solid #d5a928;
+  font-size: 1.2rem;
+}
+
+.certificate-witnesses p {
+  margin: 7px 0;
+  font-size: .92rem;
+}
+
+.party-photo {
+  background: #fff;
+  object-fit: contain !important;
+  object-position: center;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 8mm;
+  }
+
+  html,
+  body {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 !important;
+    background: #fff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    background: #fff !important;
+  }
+
+  .certificate-page {
+    min-height: auto !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
+  .certificate-paper {
+    width: 190mm !important;
+    max-width: 190mm !important;
+    min-height: 281mm !important;
+    box-sizing: border-box !important;
+    margin: 0 auto !important;
+    padding: 18mm 12mm !important;
+    box-shadow: none !important;
+    border-width: 6px !important;
+    page-break-inside: avoid;
+  }
+
+  .certificate-header {
+    gap: 10px !important;
+    padding-bottom: 12px !important;
+  }
+
+  .certificate-header h1 {
+    font-size: 1.45rem !important;
+  }
+
+  .certificate-parties {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+  }
+
+  .party-card {
+    padding: 12px !important;
+  }
+
+  .party-photo {
+    width: 105px !important;
+    height: 125px !important;
+  }
+
+  .certificate-actions,
+  .status-section,
+  .witnesses-section,
+  .sticky {
+    display: none !important;
+  }
+
+  .certificate-parties,
+  .certificate-details,
+  .certificate-witnesses,
+  .certificate-footer {
+    break-inside: avoid;
+  }
+
+  .party-photo {
+    display: block !important;
+    visibility: visible !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}
