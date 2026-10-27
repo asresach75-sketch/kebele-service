@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+let transporter;
 
 const maskEmail = (email) => {
   const [localPart, domain] = String(email).split('@');
@@ -7,26 +8,27 @@ const maskEmail = (email) => {
 };
 
 const getTransporter = () => {
-  const user = process.env.EMAIL_USER || process.env.SMTP_USER;
-  const pass = process.env.EMAIL_PASS || process.env.SMTP_PASS;
+  if (transporter) return transporter;
+
+  const resendApiKey = process.env.RESEND_API_KEY;
+  const user = resendApiKey ? 'resend' : process.env.EMAIL_USER || process.env.SMTP_USER;
+  const pass = resendApiKey || process.env.EMAIL_PASS || process.env.SMTP_PASS;
 
   if (!user || !pass) {
-    throw new Error('Email credentials are not configured. Set EMAIL_USER/EMAIL_PASS or SMTP_USER/SMTP_PASS.');
+    throw new Error('Email credentials are not configured. Set RESEND_API_KEY or EMAIL_USER/EMAIL_PASS or SMTP_USER/SMTP_PASS.');
   }
 
-  if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-    return nodemailer.createTransport({
-      service: 'gmail',
-      auth: { user, pass }
-    });
-  }
-
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: Number(process.env.SMTP_PORT || 587),
-    secure: Number(process.env.SMTP_PORT || 587) === 465,
+  const port = Number(process.env.SMTP_PORT || 587);
+  const transportOptions = {
+    host: resendApiKey
+      ? process.env.RESEND_SMTP_HOST || 'smtp.resend.com'
+      : process.env.SMTP_HOST || 'smtp.gmail.com',
+    port,
+    secure: port === 465,
     auth: { user, pass }
-  });
+  };
+  transporter = nodemailer.createTransport(transportOptions);
+  return transporter;
 };
 
 const sendEmail = async (options) => {
@@ -34,10 +36,12 @@ const sendEmail = async (options) => {
     throw new Error('Recipient email is required.');
   }
 
-  const user = process.env.EMAIL_USER || process.env.SMTP_USER;
+  const user = process.env.RESEND_API_KEY ? 'resend' : process.env.EMAIL_USER || process.env.SMTP_USER;
   const transporter = getTransporter();
   const mailOptions = {
-    from: process.env.SMTP_FROM || `"Digital E-Kebele Portal" <${user}>`,
+    from: process.env.RESEND_API_KEY
+      ? process.env.RESEND_FROM_EMAIL || process.env.SMTP_FROM || 'E-Kebele Portal <onboarding@resend.dev>'
+      : process.env.SMTP_FROM || `"Digital E-Kebele Portal" <${user}>`,
     to: options.email,
     subject: options.subject,
     text: options.message,
@@ -46,7 +50,13 @@ const sendEmail = async (options) => {
 
   try {
     const result = await transporter.sendMail(mailOptions);
-    console.log(`Email sent successfully to ${maskEmail(options.email)}: ${result.messageId}`);
+    const acceptedRecipients = (result.accepted || []).map((recipient) => (
+      typeof recipient === 'string' ? recipient : recipient.address
+    ));
+    if (!acceptedRecipients.some((recipient) => String(recipient).toLowerCase() === options.email.toLowerCase())) {
+      throw new Error('The email provider did not accept the recipient address.');
+    }
+    console.log(`Email accepted by provider for ${maskEmail(options.email)}: ${result.messageId}`);
     return result;
   } catch (error) {
     console.error(`Email delivery failed to ${maskEmail(options.email)}:`, error.message);

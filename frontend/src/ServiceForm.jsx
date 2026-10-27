@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { isSupportedUpload } from './utils/uploadValidation';
 
 const ServiceForm = () => {
     const navigate = useNavigate();
@@ -55,6 +56,10 @@ const ServiceForm = () => {
     const handleFileChange = (e) => {
         const { name, files } = e.target;
         if (files && files[0]) {
+            if (!isSupportedUpload(files[0])) {
+                setMessage('Upload a JPG, PNG, or PDF file no larger than 5 MB.');
+                return;
+            }
             setFormData({ ...formData, [name]: files[0] });
         }
     };

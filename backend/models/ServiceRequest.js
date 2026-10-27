@@ -22,15 +22,44 @@ const serviceRequestSchema = new mongoose.Schema({
   email: { type: String, trim: true, lowercase: true },
   emergencyContactName: { type: String },
   emergencyPhone: { type: String },
+  childFullName: { type: String },
+  fatherFullName: { type: String },
+  fatherDob: { type: String },
+  fatherNationality: { type: String },
+  motherFullName: { type: String },
+  motherDob: { type: String },
+  motherNationality: { type: String },
+  parentIDNumber: { type: String },
+  husbandDob: { type: String },
+  wifeDob: { type: String },
+  witness1Name: { type: String },
+  witness1Phone: { type: String },
+  witness1Id: { type: String },
+  witness2Name: { type: String },
+  witness2Phone: { type: String },
+  witness2Id: { type: String },
+  witness3Name: { type: String },
+  witness3Phone: { type: String },
+  witness3Id: { type: String },
   region: { type: String },
   nationalId: { type: String },
+  identityVerificationStatus: {
+    type: String,
+    enum: ['NOT_REQUIRED', 'VERIFIED', 'PENDING_MANUAL'],
+    default: 'NOT_REQUIRED'
+  },
+  renewalReason: { type: String, enum: ['EXPIRED', 'LOST', 'DAMAGED'] },
+  idExpiryDate: { type: String },
   applicationId: { type: String, unique: true, required: true },
   paymentAmount: { type: Number, default: 150 },
   paymentStatus: { type: String, default: 'Unpaid' },
+  paymentMethod: { type: String },
   paymentRef: { type: String },
   paymentPhone: { type: String },
   paymentVerifiedAt: { type: Date },
   paymentVerifiedBy: { type: String },
+  completedAt: { type: Date },
+  completedBy: { type: String },
   amountPaid: { type: Number },
   currency: { type: String, default: 'ETB' },
   zone: { type: String },
@@ -38,7 +67,16 @@ const serviceRequestSchema = new mongoose.Schema({
   kebele: { type: String },
   residenceAddress: { type: String },
   serviceType: { type: String, required: true },
+  isTransfer: { type: Boolean, default: false },
   passportPhoto: { type: String },
+  previousIdDocument: { type: String },
+  policeReport: { type: String },
+  damagedIdDocument: { type: String },
+  releaseLetter: { type: String },
+  housingProof: { type: String },
+  localLeaderVerification: { type: String },
+  policeClearance: { type: String },
+  employmentLetter: { type: String },
   birthCertificate: { type: String },
   deathCertificate: { type: String },
   divorceDocument: { type: String },
@@ -59,6 +97,7 @@ const serviceRequestSchema = new mongoose.Schema({
   wifePhoto: { type: String },
   marriageType: { type: String },
   marriageDate: { type: String },
+  marriageRegistrationNumber: { type: String },
   placeOfMarriage: { type: String },
   kebeleWoreda: { type: String },
   husbandWitness: { type: String },
@@ -66,7 +105,27 @@ const serviceRequestSchema = new mongoose.Schema({
   details: { type: String, default: '' },
   userId: { type: String },
   status: { type: String, default: 'PENDING_OFFICER' },
+  correctionReason: { type: String, default: '' },
+  statusHistory: {
+    type: [{
+      status: { type: String, required: true },
+      changedAt: { type: Date, default: Date.now },
+      actorRole: { type: String, default: 'system' },
+      reason: { type: String, default: '' }
+    }],
+    default: []
+  },
   createdAt: { type: Date, default: Date.now }
 }, { strict: false, timestamps: true });
+
+serviceRequestSchema.pre('validate', function recordInitialStatus() {
+  if (this.isNew && this.statusHistory.length === 0) {
+    this.statusHistory.push({
+      status: this.status || 'PENDING_OFFICER',
+      changedAt: this.createdAt || new Date(),
+      actorRole: 'citizen'
+    });
+  }
+});
 
 module.exports = mongoose.model('ServiceRequest', serviceRequestSchema);

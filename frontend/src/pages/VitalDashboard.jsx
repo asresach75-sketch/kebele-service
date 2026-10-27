@@ -10,7 +10,7 @@ const VitalDashboard = () => {
 
   const fetchVitalRequests = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token') || localStorage.getItem('token');
       const res = await axios.get('/api/services/vital-requests', {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -22,7 +22,7 @@ const VitalDashboard = () => {
 
   const handleStatusUpdate = async (id, status) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token') || localStorage.getItem('token');
       await axios.put(
         `/api/services/vital-status/${id}`,
         { status },

@@ -1,0 +1,187 @@
+.manage-fees-page {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  background: #f3f6fa;
+  color: #172033;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+.manage-fees-header {
+  flex: 0 0 auto;
+  border-bottom: 1px solid #dbeafe;
+  background: #0b4d9c;
+  color: #fff;
+  box-shadow: 0 2px 8px rgb(15 23 42 / 12%);
+}
+
+.manage-fees-header-inner {
+  display: flex;
+  width: min(100% - 32px, 1280px);
+  min-height: 56px;
+  margin: 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.manage-fees-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.manage-fees-brand-mark {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 8px;
+  background: #2563eb;
+  font-size: .9rem;
+  font-weight: 800;
+}
+
+.manage-fees-brand strong,
+.manage-fees-brand div > span {
+  display: block;
+}
+
+.manage-fees-brand strong {
+  font-size: .82rem;
+}
+
+.manage-fees-brand div > span {
+  margin-top: 1px;
+  color: #dbeafe;
+  font-size: .65rem;
+}
+
+.manage-fees-dashboard-link {
+  padding: 7px 11px;
+  border: 1px solid rgb(255 255 255 / 24%);
+  border-radius: 7px;
+  background: #174f91;
+  color: #fff;
+  font: inherit;
+  font-size: .74rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.manage-fees-dashboard-link:hover {
+  background: #1d4ed8;
+}
+
+.manage-fees-main {
+  flex: 1;
+  width: min(100% - 32px, 900px);
+  margin: 0 auto;
+  padding: 28px 0;
+}
+
+.manage-fees-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.manage-fees-eyebrow {
+  color: #1d4ed8;
+  font-size: .62rem;
+  font-weight: 800;
+  letter-spacing: .1em;
+}
+
+.manage-fees-title h1 {
+  margin: 4px 0 6px;
+  color: #172033;
+  font-size: clamp(1.2rem, 3vw, 1.7rem);
+}
+
+.manage-fees-title p {
+  margin: 0;
+  color: #64748b;
+  font-size: .8rem;
+}
+
+.manage-fees-back-link {
+  flex: 0 0 auto;
+  margin-top: 4px;
+  padding: 8px 11px;
+  border: 0;
+  border-radius: 7px;
+  background: #e2e8f0;
+  color: #334155;
+  font: inherit;
+  font-size: .72rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.manage-fees-back-link:hover {
+  background: #cbd5e1;
+}
+
+.manage-fees-card {
+  padding: 8px 22px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgb(15 23 42 / 6%);
+}
+
+.manage-fees-message,
+.manage-fees-error {
+  padding: 11px 12px;
+  border-radius: 7px;
+  font-weight: 700;
+}
+
+.manage-fees-message {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.manage-fees-error {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.manage-fees-loading {
+  color: #64748b;
+}
+
+.manage-fees-footer {
+  flex: 0 0 auto;
+  padding: 9px 16px;
+  border-top: 1px solid #e2e8f0;
+  background: #172033;
+  color: #cbd5e1;
+  font-size: .68rem;
+  text-align: center;
+}
+
+.manage-fee-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(120px, 150px) auto;
+  align-items: end;
+  gap: 12px;
+  padding: 18px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+.manage-fee-row label { min-width: 0; color: #172033; font-weight: 700; }
+.manage-fee-row small { display: block; color: #64748b; font-weight: 400; }
+.manage-fee-row input { width: 100%; box-sizing: border-box; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font: inherit; font-weight: 700; }
+.manage-fee-row button { border: 0; border-radius: 6px; padding: 10px 14px; color: #172033; background: #d99a00; font: inherit; font-weight: 800; cursor: pointer; }
+.manage-fee-row button:disabled { cursor: wait; opacity: .65; }
+.manage-fee-row button:hover:not(:disabled) { background: #f0b429; }
+@media (max-width: 560px) {
+  .manage-fees-main { width: min(100% - 24px, 900px); padding: 20px 0; }
+  .manage-fees-title { flex-direction: column; gap: 12px; }
+  .manage-fees-card { padding: 6px 14px; }
+  .manage-fee-row { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+  .manage-fee-row label { grid-column: 1 / -1; }
+}

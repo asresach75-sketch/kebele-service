@@ -1,0 +1,619 @@
+.application-history {
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, .04);
+}
+
+.tracker-workflow {
+  margin-top: 22px;
+  padding: 20px;
+  border: 1px solid #dbe4ee;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, .04);
+}
+
+.tracker-workflow h3 {
+  margin: 0 0 18px;
+  color: #172033;
+  font-size: 1rem;
+}
+
+.tracker-workflow-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.tracker-workflow-heading h3 {
+  margin: 0;
+}
+
+.tracker-refresh-button {
+  padding: 8px 11px;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font: inherit;
+  font-size: .76rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.tracker-refresh-button:disabled {
+  cursor: wait;
+  opacity: .65;
+}
+
+.tracker-workflow-steps {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tracker-workflow-step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  color: #64748b;
+  font-size: .76rem;
+  font-weight: 650;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.tracker-workflow-step:not(:last-child)::after {
+  position: absolute;
+  top: 16px;
+  left: calc(50% + 21px);
+  width: calc(100% - 22px);
+  height: 2px;
+  background: #dbe4ee;
+  content: '';
+}
+
+.tracker-workflow-step.is-complete:not(:last-child)::after {
+  background: #059669;
+}
+
+.tracker-workflow-marker {
+  z-index: 1;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 2px solid #cbd5e1;
+  border-radius: 50%;
+  background: #fff;
+  color: #64748b;
+  font-size: .78rem;
+  font-weight: 800;
+}
+
+.tracker-workflow-step.is-complete {
+  color: #047857;
+}
+
+.tracker-workflow-step.is-complete .tracker-workflow-marker {
+  border-color: #059669;
+  background: #059669;
+  color: #fff;
+}
+
+.tracker-workflow-step.is-current {
+  color: #1d4ed8;
+}
+
+.tracker-workflow-step.is-current .tracker-workflow-marker {
+  border-color: #2563eb;
+  background: #eff6ff;
+  color: #1d4ed8;
+  box-shadow: 0 0 0 4px #dbeafe;
+}
+
+.tracker-workflow-note {
+  margin: 18px 0 0;
+  padding: 11px 13px;
+  border-radius: 9px;
+  font-size: .84rem;
+}
+
+.tracker-workflow-note--warning {
+  border: 1px solid #fde68a;
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.tracker-workflow-note--error {
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.application-history h3 {
+  margin: 0 0 16px;
+  color: #172033;
+  font-size: 1rem;
+}
+
+.application-history ol {
+  margin: 0 0 0 7px;
+  padding: 0 0 0 22px;
+  border-left: 2px solid #dbe4ee;
+  list-style: none;
+}
+
+.application-history li {
+  position: relative;
+  padding: 0 0 18px 10px;
+}
+
+.application-history li:last-child {
+  padding-bottom: 0;
+}
+
+.history-marker {
+  position: absolute;
+  top: 3px;
+  left: -29px;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #1769dc;
+  box-shadow: 0 0 0 1px #1769dc;
+}
+
+.application-history li:last-child .history-marker {
+  background: #168b5b;
+  box-shadow: 0 0 0 1px #168b5b;
+}
+
+.application-history li .history-marker--current,
+.application-history .history-event--paid_pending_finance .history-marker {
+  background: #d97706;
+  box-shadow: 0 0 0 1px #d97706, 0 0 0 5px #fef3c7;
+}
+
+.history-event-content strong,
+.history-event-content time,
+.history-actor {
+  display: block;
+}
+
+.history-event-content strong {
+  color: #25334a;
+  font-size: .88rem;
+}
+
+.history-event-content time,
+.history-actor {
+  margin-top: 4px;
+  color: #68778c;
+  font-size: .76rem;
+}
+
+.history-event-content p {
+  margin: 7px 0 0;
+  color: #854d0e;
+  font-size: .82rem;
+  overflow-wrap: anywhere;
+}
+
+.history-event--payment_pending .history-event-content strong,
+.history-event--paid_pending_finance .history-event-content strong {
+  color: #a16207;
+}
+
+.tracker-payment-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 20px;
+  padding: 18px 20px;
+  border: 1px solid #bfdbfe;
+  border-radius: 14px;
+  background: linear-gradient(120deg, #eff6ff, #f8fafc);
+}
+
+.tracker-payment-label,
+.tracker-payment-amount {
+  display: block;
+}
+
+.tracker-payment-label {
+  color: #475569;
+  font-size: .85rem;
+  font-weight: 700;
+}
+
+.tracker-payment-amount {
+  margin-top: 4px;
+  color: #1d4ed8;
+  font-size: 1.5rem;
+}
+
+.payment-status-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 6px 12px;
+  border: 1px solid;
+  border-radius: 999px;
+  font-size: .8rem;
+  font-weight: 700;
+}
+
+.payment-status-badge--unpaid {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.payment-status-badge--pending {
+  border-color: #fde68a;
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.payment-status-badge--paid {
+  border-color: #a7f3d0;
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.tracker-payment-panel {
+  margin-top: 18px;
+  padding: 20px;
+  border: 1px solid #bfdbfe;
+  border-radius: 14px;
+  background: #eff6ff;
+}
+
+.tracker-payment-panel h3 {
+  margin: 0 0 8px;
+  color: #1e3a8a;
+}
+
+.tracker-payment-panel > p {
+  margin: 0;
+  color: #475569;
+}
+
+.telebirr-hint {
+  display: block;
+  margin-top: 5px;
+  color: #64748b;
+  font-size: .75rem;
+}
+
+.payment-receipt {
+  margin-top: 20px;
+  padding: 22px;
+  border: 1px solid #d1d5db;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.receipt-brand {
+  color: #1d4ed8;
+  font-size: .8rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.payment-receipt h2 {
+  margin: 8px 0;
+  color: #172033;
+  font-size: 1.2rem;
+}
+
+.receipt-confirmed {
+  color: #047857;
+  font-weight: 700;
+}
+
+.payment-receipt dl {
+  margin: 16px 0;
+}
+
+.payment-receipt dl div {
+  display: grid;
+  grid-template-columns: minmax(130px, .8fr) 1.2fr;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.payment-receipt dt {
+  color: #64748b;
+  font-weight: 600;
+}
+
+.payment-receipt dd {
+  margin: 0;
+  color: #172033;
+  overflow-wrap: anywhere;
+}
+
+.receipt-print-button {
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 8px;
+  background: #047857;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.track-page {
+  box-sizing: border-box;
+  min-height: 75vh;
+  padding: clamp(24px, 5vw, 56px) 16px;
+  background:
+    radial-gradient(ellipse at 15% 0%, rgba(219, 234, 254, 0.72), transparent 38%),
+    #f4f7fb;
+  color: #172033;
+  font-family: Arial, sans-serif;
+}
+
+.track-card {
+  box-sizing: border-box;
+  width: min(100%, 780px);
+  margin: 0 auto;
+  padding: clamp(20px, 4vw, 36px);
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 22px 55px rgba(15, 23, 42, 0.09);
+}
+
+.track-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.track-header-copy {
+  min-width: 0;
+}
+
+.track-eyebrow {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #2563eb;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+}
+
+.track-header h1 {
+  margin: 0;
+  color: #10284f;
+  font-size: clamp(1.55rem, 4vw, 2.2rem);
+  line-height: 1.2;
+}
+
+.track-header p {
+  max-width: 560px;
+  margin: 10px 0 0;
+  color: #64748b;
+  font-size: 0.94rem;
+  line-height: 1.6;
+}
+
+.track-search-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: end;
+}
+
+.track-search-form label {
+  grid-column: 1 / -1;
+  color: #334155;
+  font-size: 0.84rem;
+  font-weight: 750;
+}
+
+.track-search-form input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 11px;
+  outline: none;
+  background: #fff;
+  color: #172033;
+  font: inherit;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.track-search-form input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.14);
+}
+
+.track-search-button {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 11px;
+  background: #1d4ed8;
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.track-search-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: #1e40af;
+}
+
+.track-search-button:disabled {
+  cursor: wait;
+  opacity: 0.75;
+}
+
+.track-spinner {
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: track-spin 700ms linear infinite;
+}
+
+@keyframes track-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.track-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin: 18px 0 22px;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.track-links a {
+  color: #1d4ed8;
+  text-decoration: none;
+}
+
+.track-links a:hover {
+  text-decoration: underline;
+}
+
+.track-help-tip {
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
+  background: #eff6ff;
+  color: #334155;
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.track-help-tip p {
+  margin: 0;
+}
+
+.track-help-tip p:first-child {
+  margin-bottom: 5px;
+  color: #1e3a8a;
+  font-weight: 800;
+}
+
+.track-error {
+  margin: 16px 0;
+  padding: 13px 15px;
+  border: 1px solid #fecaca;
+  border-radius: 11px;
+  background: #fef2f2;
+  color: #991b1b;
+  font-size: 0.85rem;
+  font-weight: 650;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.track-result {
+  margin-top: 20px;
+  padding: clamp(16px, 3vw, 24px);
+  border: 1px solid #dbe3ef;
+  border-radius: 16px;
+  background: #f8fafc;
+}
+
+.track-result > p {
+  margin: 0 0 10px;
+  color: #334155;
+  line-height: 1.55;
+}
+
+.track-result > p:last-of-type {
+  margin-bottom: 0;
+}
+
+@media (max-width: 520px) {
+  .track-header {
+    flex-direction: column-reverse;
+    gap: 12px;
+  }
+
+  .track-search-form {
+    grid-template-columns: 1fr;
+  }
+
+  .track-search-form label {
+    grid-column: auto;
+  }
+
+  .track-search-button {
+    width: 100%;
+  }
+
+  .application-history,
+  .tracker-workflow,
+  .tracker-payment-panel,
+  .payment-receipt {
+    padding: 16px;
+  }
+
+  .tracker-workflow-steps {
+    grid-template-columns: 1fr;
+    gap: 0;
+    justify-items: start;
+  }
+
+  .tracker-workflow-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .tracker-workflow-step {
+    min-height: 52px;
+    flex-direction: row;
+    text-align: left;
+  }
+
+  .tracker-workflow-step:not(:last-child)::after {
+    top: 34px;
+    left: 16px;
+    width: 2px;
+    height: 18px;
+  }
+
+  .payment-receipt dl div {
+    grid-template-columns: 1fr;
+    gap: 3px;
+  }
+}

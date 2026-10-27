@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { isSupportedUpload } from '../utils/uploadValidation';
 
 export default function ApplicationForm() {
   const navigate = useNavigate();
@@ -43,14 +44,12 @@ export default function ApplicationForm() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20 MB
-
   const handleFileChange = (e) => {
     const { name, files } = e.target;
     if (files && files[0]) {
       const file = files[0];
-      if (file.size > MAX_FILE_SIZE) {
-        setMessage('Selected file is too large. Please upload files smaller than 20MB.');
+      if (!isSupportedUpload(file)) {
+        setMessage('Upload a JPG, PNG, or PDF file no larger than 5 MB.');
         return;
       }
       setFormData((prev) => ({ ...prev, [name]: file }));

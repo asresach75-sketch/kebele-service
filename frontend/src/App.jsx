@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import ApplicationForm from './components/ApplicationForm';
 import VitalEventsSelection from './pages/VitalEventsSelection';
 import AdminDashboard from './AdminDashboard';
+import AdminAuditLogs from './AdminAuditLogs';
 import AddStaff from './AddStaff';
 import UserFeedbacks from './UserFeedbacks';
 import UserDashboard from './UserDashboard';
@@ -11,6 +12,8 @@ import VitalDashboard from './pages/VitalDashboard';
 import SupportDashboard from './pages/SupportDashboard';
 import Login from './Login';
 import Signup from './Signup';
+import ForgotPassword from './ForgotPassword';
+import ResetPassword from './ResetPassword';
 import Home from './Home';
 import About from './About';
 import TrackStatus from './TrackStatus';
@@ -28,11 +31,26 @@ import NewIDApplicationForm from './NewIDApplicationForm';
 import ManageFees from './ManageFees';
 import Contact from './Contact';
 import Navbar from './components/Navbar';
+import VerifyDocument from './pages/VerifyDocument';
+import SiteFooter from './components/SiteFooter';
 
 function RoutedApp({ darkMode, toggleDarkMode }) {
   const location = useLocation();
-  const hideHeaderRoutes = ['/login', '/signup', '/admin-dashboard', '/finance-dashboard', '/officer-dashboard', '/digital-id-card'];
+  const hideHeaderRoutes = [
+    '/login',
+    '/admin-dashboard',
+    '/admin-applications',
+    '/admin-logs',
+    '/add-staff',
+    '/user-feedbacks',
+    '/manage-fees',
+    '/finance-dashboard',
+    '/officer-dashboard',
+    '/digital-id-card',
+  ];
   const shouldHideHeader = hideHeaderRoutes.includes(location.pathname);
+  const hideFooterRoutes = ['/login', '/admin-dashboard', '/admin-applications', '/admin-logs', '/add-staff', '/user-feedbacks', '/manage-fees'];
+  const shouldHideFooter = hideFooterRoutes.includes(location.pathname);
 
   return (
     <>
@@ -42,6 +60,9 @@ function RoutedApp({ darkMode, toggleDarkMode }) {
         <Route path="/home" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/verify-document/:applicationId" element={<VerifyDocument />} />
         <Route path="/officer-dashboard" element={<ProtectedRoute allowedRoles={['officer']}><OfficerDashboard /></ProtectedRoute>} />
         <Route path="/finance-dashboard" element={<ProtectedRoute allowedRoles={['finance']}><FinanceDashboard /></ProtectedRoute>} />
         <Route path="/apply" element={<ProtectedRoute><NewIDApplicationForm /></ProtectedRoute>} />
@@ -60,6 +81,8 @@ function RoutedApp({ darkMode, toggleDarkMode }) {
         <Route path="/manage-fees" element={<ProtectedRoute allowedRoles={['admin']}><ManageFees /></ProtectedRoute>} />
         <Route path="/marriage-certificate/:applicationId" element={<MarriageCertificate />} />
         <Route path="/admin-dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
+        <Route path="/admin-applications" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
+        <Route path="/admin-logs" element={<ProtectedRoute allowedRoles={['admin']}><AdminAuditLogs /></ProtectedRoute>} />
         <Route path="/add-staff" element={<ProtectedRoute allowedRoles={['admin']}><AddStaff /></ProtectedRoute>} />
         <Route path="/user-feedbacks" element={<ProtectedRoute allowedRoles={['admin']}><UserFeedbacks /></ProtectedRoute>} />
         <Route path="/verifier-dashboard" element={<ProtectedRoute allowedRoles={['admin', 'verifier']}><VerifierDashboard /></ProtectedRoute>} />
@@ -67,6 +90,7 @@ function RoutedApp({ darkMode, toggleDarkMode }) {
         <Route path="/support-dashboard" element={<ProtectedRoute allowedRoles={['admin', 'support']}><SupportDashboard /></ProtectedRoute>} />
         <Route path="/user-dashboard" element={<ProtectedRoute allowedRoles={['admin', 'officer', 'finance', 'verifier', 'vital', 'support']}><UserDashboard /></ProtectedRoute>} />
       </Routes>
+      {!shouldHideFooter && <SiteFooter />}
     </>
   );
 }

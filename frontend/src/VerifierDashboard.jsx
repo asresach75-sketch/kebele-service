@@ -6,7 +6,7 @@ function VerifierDashboard() {
 
   const loadRequests = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token') || localStorage.getItem('token');
       const response = await fetch('/api/services/all', { headers: { Authorization: `Bearer ${token}` } });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Failed to load requests');
@@ -19,7 +19,7 @@ function VerifierDashboard() {
   useEffect(() => { loadRequests(); }, []);
 
   const updateStatus = async (id, status) => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
     const response = await fetch(`/api/services/update-status/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import './BirthRegistration.css';
 
 function BirthRegistration() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    childFullName: '', gender: '', dob: '', pob: '', fatherFullName: '',
-    fatherNationality: 'Ethiopian', motherFullName: '', motherNationality: 'Ethiopian',
+    childFullName: '', gender: '', dob: '', pob: '', fatherFullName: '', fatherDob: '',
+    fatherNationality: 'Ethiopian', motherFullName: '', motherDob: '', motherNationality: 'Ethiopian',
     parentIDNumber: '', phone: '', email: '', country: 'Ethiopia', region: '', zone: '', wereda: '',
     registrationNumber: '', registrarName: '', registrationDate: new Date().toISOString().split('T')[0], hospitalDoc: null, childPhoto: null
   });
@@ -38,7 +39,25 @@ function BirthRegistration() {
     });
     if (!/^(09|07)\d{8}$/.test(formData.phone.trim())) nextErrors.phone = 'Use a valid Ethiopian number starting with 09 or 07.';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) nextErrors.email = 'Enter a valid email address.';
-    if (!formData.dob || new Date(formData.dob) > new Date()) nextErrors.dob = 'Date of birth is required and cannot be in the future.';
+    const dateOnly = (value) => {
+      const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+      if (!match) return false;
+      const [, year, month, day] = match;
+      return new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)))
+        .toISOString().slice(0, 10) === value;
+    };
+    const today = new Date();
+    const todayDate = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
+    if (!dateOnly(formData.dob) || new Date(`${formData.dob}T00:00:00Z`) > todayDate) {
+      nextErrors.dob = 'Enter a valid date of birth that is not in the future.';
+    }
+    ['fatherDob', 'motherDob'].forEach((field) => {
+      if (!dateOnly(formData[field]) || new Date(`${formData[field]}T00:00:00Z`) > todayDate) {
+        nextErrors[field] = 'Enter a valid parent date of birth that is not in the future.';
+      } else if (dateOnly(formData.dob) && new Date(`${formData[field]}T00:00:00Z`) >= new Date(`${formData.dob}T00:00:00Z`)) {
+        nextErrors[field] = 'Parent date of birth must be before the child date of birth.';
+      }
+    });
     ['pob', 'region', 'zone', 'wereda'].forEach((field) => { if (!formData[field].trim()) nextErrors[field] = 'This field is required.'; });
     if (formData.hospitalDoc && (!['application/pdf', 'image/jpeg', 'image/png'].includes(formData.hospitalDoc.type) || formData.hospitalDoc.size > 5 * 1024 * 1024)) nextErrors.hospitalDoc = 'Document must be PDF/JPG/PNG and no larger than 5 MB.';
     if (!formData.childPhoto) nextErrors.childPhoto = 'Child photo is required.';
@@ -62,7 +81,7 @@ function BirthRegistration() {
       payload.append('serviceType', 'BIRTH_REGISTRATION');
 
       const res = await axios.post('/api/services/submit-application', payload, {
-        headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${localStorage.getItem('token')}` }
+        headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}` }
       });
 
       setMessage('Birth registration request submitted successfully! Redirecting to track...');
@@ -77,66 +96,108 @@ function BirthRegistration() {
     }
   };
 
+  const renderField = (name, label, type = 'text', required = true, props = {}) => (
+    <div className="birth-registration-field" key={name}>
+      <label htmlFor={`birth-${name}`}>{label}{required ? ' *' : ''}</label>
+      <input
+        id={`birth-${name}`}
+        type={type}
+        name={name}
+        value={formData[name]}
+        onChange={handleChange}
+        required={required}
+        style={inputStyle}
+        {...props}
+      />
+      {errors[name] && <small style={errorStyle}>{errors[name]}</small>}
+    </div>
+  );
+
   return (
-    <div style={{ maxWidth: 760, margin: '40px auto', padding: '24px', fontFamily: 'Arial, sans-serif', backgroundColor: '#f8fafc', borderRadius: '16px' }}>
-      <div style={{ marginBottom: '24px' }}>
+    <main className="birth-registration-page">
+      <div className="birth-registration-card">
+        <div className="birth-registration-header">
+          <div>
         <h1>Birth Registration / የልደት ምዝገባ</h1>
         <p>Complete the form below to submit your birth registration request.</p>
-        <Link to="/vital-events" style={{ color: '#1d4ed8', textDecoration: 'none' }}>← Back to Vital Events</Link>
+          </div>
+          <Link to="/vital-events" className="birth-registration-back">← Back to Vital Events</Link>
       </div>
-      {message && <div style={{ marginBottom: '20px', padding: '14px', borderRadius: '10px', backgroundColor: '#d1fae5', color: '#065f46' }}>{message}</div>}
-      <form onSubmit={handleSubmit}>
-        {[
-          ['childFullName', "Child's Full Name / ሙሉ ስም"], ['fatherFullName', "Father's Full Name / የአባት ስም"],
-          ['motherFullName', "Mother's Full Name / የእናት ስም"], ['parentIDNumber', 'Parent ID Number / የወላጅ መታወቂያ'],
-          ['phone', 'Phone Number / ስልክ'], ['pob', 'Place of Birth / የትውልድ ቦታ'],
-          ['country', 'Country / ሀገር'], ['region', 'Region / ክልል'], ['zone', 'Zone / ዞን'], ['wereda', 'Wereda / ወረዳ']
-        ].map(([name, label]) => <React.Fragment key={name}><label>{label}</label><input name={name} value={formData[name]} onChange={handleChange} required style={inputStyle} /></React.Fragment>)}
-        <label>Email Address / ኢሜይል</label>
-        <input type="email" name="email" value={formData.email} onChange={handleChange} required placeholder="example@gmail.com" style={inputStyle} />
-        <label>Gender / ጾታ</label>
-        <select name="gender" value={formData.gender} onChange={handleChange} required style={inputStyle}>
-          <option value="">Select Gender / ጾታ ይምረጡ</option>
-          <option value="Male">Male / ወንድ</option>
-          <option value="Female">Female / ሴት</option>
-        </select>
-        <label>Date of Birth / የልደት ቀን</label>
-        <input type="date" name="dob" max={new Date().toISOString().split('T')[0]} value={formData.dob} onChange={handleChange} required style={inputStyle} />
-        <label>Birth Notification / Hospital Document (Optional / አማራጭ)</label>
-        <input type="file" name="hospitalDoc" accept="image/png,image/jpeg,.pdf" onChange={handleFileChange} style={fileStyle} />{errors.hospitalDoc && <small style={errorStyle}>{errors.hospitalDoc}</small>}
-        <label>Child Photo / የልጁ/ዋ ፎቶ *</label>
-        <input type="file" name="childPhoto" required accept="image/png,image/jpeg" onChange={handleFileChange} style={fileStyle} />{errors.childPhoto && <small style={errorStyle}>{errors.childPhoto}</small>}
-        <label>Birth Registration Number / የልደት ምዝገባ ቁጥር (Optional / አማራጭ)</label><input name="registrationNumber" value={formData.registrationNumber} onChange={handleChange} style={inputStyle} />
-        <label>Date of Registration / የተመዘገበበት ቀን</label><input type="date" name="registrationDate" value={formData.registrationDate} onChange={handleChange} max={new Date().toISOString().split('T')[0]} style={inputStyle} />
-        <label>Registrar Name / መዝጋቢው ስም</label><input name="registrarName" value={formData.registrarName} onChange={handleChange} style={inputStyle} />
-        <button type="submit" disabled={submitting} style={{ ...submitButton, opacity: submitting ? 0.6 : 1, cursor: submitting ? 'not-allowed' : 'pointer' }}>{submitting ? 'Submitting...' : 'Submit Birth Request'}</button>
+      {message && <div className="birth-registration-message" role="status">{message}</div>}
+      <form onSubmit={handleSubmit} className="birth-registration-form">
+        <section className="birth-registration-section">
+          <h2>Child &amp; Parent Information / የልጅ እና ወላጅ መረጃ</h2>
+          <div className="birth-registration-grid">
+            {renderField('childFullName', "Child's Full Name / ሙሉ ስም")}
+            {renderField('parentIDNumber', 'Parent ID Number / የወላጅ መታወቂያ')}
+            {renderField('fatherFullName', "Father's Full Name / የአባት ስም")}
+            {renderField('fatherDob', "Father's Date of Birth / የአባት የልደት ቀን", 'date', true, { max: new Date().toISOString().split('T')[0] })}
+            {renderField('motherFullName', "Mother's Full Name / የእናት ስም")}
+            {renderField('motherDob', "Mother's Date of Birth / የእናት የልደት ቀን", 'date', true, { max: new Date().toISOString().split('T')[0] })}
+            <div className="birth-registration-field">
+              <label htmlFor="birth-gender">Gender / ጾታ *</label>
+              <select id="birth-gender" name="gender" value={formData.gender} onChange={handleChange} required style={inputStyle}>
+                <option value="">Select Gender / ጾታ ይምረጡ</option>
+                <option value="Male">Male / ወንድ</option>
+                <option value="Female">Female / ሴት</option>
+              </select>
+            </div>
+            {renderField('dob', 'Date of Birth / የልደት ቀን', 'date', true, { max: new Date().toISOString().split('T')[0] })}
+          </div>
+        </section>
+        <section className="birth-registration-section">
+          <h2>Contact &amp; Location / አድራሻ እና ግንኙነት</h2>
+          <div className="birth-registration-grid birth-registration-grid-three">
+            {renderField('phone', 'Phone Number / ስልክ')}
+            {renderField('email', 'Email Address / ኢሜይል', 'email', true, { placeholder: 'example@gmail.com' })}
+            {renderField('pob', 'Place of Birth / የትውልድ ቦታ')}
+            {renderField('country', 'Country / ሀገር')}
+            {renderField('region', 'Region / ክልል')}
+            {renderField('zone', 'Zone / ዞን')}
+            {renderField('wereda', 'Wereda / ወረዳ')}
+          </div>
+        </section>
+        <section className="birth-registration-section">
+          <h2>Registration Details / የምዝገባ መረጃ</h2>
+          <div className="birth-registration-grid">
+            {renderField('registrationNumber', 'Birth Registration Number / የልደት ምዝገባ ቁጥር', 'text', false)}
+            {renderField('registrationDate', 'Date of Registration / የተመዘገበበት ቀን', 'date', false, { max: new Date().toISOString().split('T')[0] })}
+            {renderField('registrarName', 'Registrar Name / መዝጋቢው ስም', 'text', false)}
+          </div>
+        </section>
+        <section className="birth-registration-section birth-registration-documents">
+          <h2>Supporting Documents / አስፈላጊ ሰነዶች</h2>
+          <div className="birth-registration-grid">
+            <div className="birth-registration-field">
+              <label htmlFor="birth-hospitalDoc">Birth Notification / Hospital Document (Optional / አማራጭ)</label>
+              <input id="birth-hospitalDoc" type="file" name="hospitalDoc" accept="image/png,image/jpeg,.pdf" onChange={handleFileChange} style={fileStyle} />
+              {errors.hospitalDoc && <small style={errorStyle}>{errors.hospitalDoc}</small>}
+            </div>
+            <div className="birth-registration-field">
+              <label htmlFor="birth-childPhoto">Child Photo / የልጁ/ዋ ፎቶ *</label>
+              <input id="birth-childPhoto" type="file" name="childPhoto" required accept="image/png,image/jpeg" onChange={handleFileChange} style={fileStyle} />
+              {errors.childPhoto && <small style={errorStyle}>{errors.childPhoto}</small>}
+            </div>
+          </div>
+          <p className="birth-registration-hint">JPG, PNG, or PDF files only. Maximum 5MB per document. Child photo maximum 2MB.</p>
+        </section>
+        <button className="birth-registration-submit" type="submit" disabled={submitting}>
+          {submitting ? 'Submitting...' : 'Submit Birth Request'}
+        </button>
       </form>
-    </div>
+      </div>
+    </main>
   );
 }
 
 const inputStyle = {
   width: '100%',
-  padding: '10px',
-  margin: '8px 0 16px',
-  borderRadius: '8px',
-  border: '1px solid #cbd5e1',
-  boxSizing: 'border-box'
+  boxSizing: 'border-box',
 };
 
 const fileStyle = {
   width: '100%',
-  margin: '8px 0 16px'
-};
-
-const submitButton = {
-  padding: '12px 22px',
-  backgroundColor: '#1d4ed8',
-  color: '#ffffff',
-  border: 'none',
-  borderRadius: '10px',
-  cursor: 'pointer',
-  fontWeight: 700
+  margin: '8px 0 0',
 };
 
 const errorStyle = { display: 'block', color: '#b91c1c', fontSize: '12px', marginBottom: '10px' };

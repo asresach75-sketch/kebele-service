@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from './context/LanguageContext';
+import { isValidApplicantName, isValidEthiopianPhoneNumber } from './utils/idApplicationValidation';
 
 const DigitalIDCard = () => {
   const { t } = useLanguage();
@@ -14,13 +15,33 @@ const DigitalIDCard = () => {
     const folder = normalizedPath.includes('/marriage_docs/') ? 'marriage_docs/' : '';
     return `/uploads/${folder}${fileName}`;
   };
-  const idNumber = application.applicationId || application.nationalId || 'N/A';
-  const fullName = application.fullName || application.childFullName || application.parentName || application.husbandName || application.wifeName || 'N/A';
-  const phone = application.phoneNumber || application.phone || application.husbandPhone || application.wifePhone || 'N/A';
-  const emergencyContact = application.emergencyContactName || application.emergencyCaller || application.emergencyContact || application.emergency_caller || application.emergency_contact || 'N/A';
-  const emergencyPhone = application.emergencyPhone || application.emergencyContactPhone || application.emergency_phone || application.emergency_contact_phone || 'N/A';
+  const idNumber = application.nationalId || application.applicationId || 'N/A';
+  const fullNameValue = application.fullName || application.childFullName || application.parentName || application.husbandName || application.wifeName || '';
+  const fullName = fullNameValue
+    ? isValidApplicantName(fullNameValue) ? fullNameValue : 'Update required'
+    : 'N/A';
+  const phoneValue = application.phoneNumber || application.phone || application.husbandPhone || application.wifePhone || '';
+  const phone = phoneValue
+    ? isValidEthiopianPhoneNumber(phoneValue) ? phoneValue : 'Update required'
+    : 'N/A';
+  const emergencyContactValue = application.emergencyContactName || application.emergencyCaller || application.emergencyContact || application.emergency_caller || application.emergency_contact || '';
+  const emergencyContact = emergencyContactValue
+    ? isValidApplicantName(emergencyContactValue) ? emergencyContactValue : 'Update required'
+    : 'N/A';
+  const emergencyPhoneValue = application.emergencyPhone || application.emergencyContactPhone || application.emergency_phone || application.emergency_contact_phone || '';
+  const emergencyPhone = emergencyPhoneValue
+    ? isValidEthiopianPhoneNumber(emergencyPhoneValue) ? emergencyPhoneValue : 'Update required'
+    : 'N/A';
   const address = [application.region, application.zone, application.woreda, application.kebele].filter(Boolean).join(', ') || 'N/A';
-  const issuedDate = application.updatedAt || application.createdAt || new Date().toISOString();
+  const issuedDate = new Date(application.completedAt || application.paymentVerifiedAt || application.createdAt || Date.now());
+  const expiryDate = new Date(issuedDate);
+  expiryDate.setFullYear(expiryDate.getFullYear() + 5);
+  const verifier = String(application.verifiedByName || application.paymentVerifiedBy || '').trim();
+  const issuedBy = verifier
+    ? verifier.includes('@') ? 'Finance Office' : verifier
+    : 'E-Kebele Service Portal';
+  const isVerifiedForPayment = application.paymentStatus === 'Verified'
+    && ['APPROVED_BY_FINANCE', 'COMPLETED'].includes(application.status);
 
   const handlePrint = () => window.print();
 
@@ -30,8 +51,8 @@ const DigitalIDCard = () => {
         <header className="digital-id-header">
           <div className="digital-id-flag" aria-hidden="true"><span /><span /><span /></div>
           <div>
-            <h1>Federal Democratic Republic of Ethiopia</h1>
-            <p>National Digital ID Card / የብሔራዊ ዲጂታል መታወቂያ</p>
+            <h1>E-Kebele Service Portal</h1>
+            <p>Digital Service ID · Not a national government ID</p>
           </div>
           <strong aria-hidden="true">ID</strong>
         </header>
@@ -48,19 +69,31 @@ const DigitalIDCard = () => {
               <div><small>ID Number / የመታወቂያ ቁጥር</small><b className="digital-id-blue">{idNumber}</b></div>
               <div><small>Gender / ጾታ</small><b>{application.gender || 'N/A'}</b></div>
               <div><small>Date of Birth / የትውልድ ቀን</small><b>{application.dateOfBirth || application.dob || 'N/A'}</b></div>
+              <div><small>Occupation / የሥራ ዘርፍ</small><b>{application.occupation || 'N/A'}</b></div>
+              <div><small>Expiry Date / የሚያበቃበት ቀን</small><b>{expiryDate.toLocaleDateString()}</b></div>
               <div><small>Phone / ስልክ ቁጥር</small><b>{phone}</b></div>
               <div><small>Nationality / ዜግነት</small><b>{application.nationality || 'Ethiopian / ኢትዮጵያዊ'}</b></div>
               <div><small>Address / አድራሻ</small><b>{address}</b></div>
               <div><small>Emergency Contact / የአደጋ ጊዜ ተጠሪ</small><b>{emergencyContact}</b></div>
               <div><small>Emergency Phone / የአደጋ ጊዜ ስልክ</small><b>{emergencyPhone}</b></div>
+              <div><small>Finance Verified By / ያረጋገጠው</small><b>{issuedBy}</b></div>
             </div>
           </div>
         </div>
 
         <footer className="digital-id-footer">
-          <span>Issued: {new Date(issuedDate).toLocaleDateString()}</span>
-          <span>Authorized Officer / የተፈቀደለት ኃላፊ</span>
-          <span className="digital-id-stamp">OFFICIAL</span>
+          <span>Issued: {issuedDate.toLocaleDateString()}</span>
+          <span>E-Kebele portal record</span>
+          {application.applicationId && isVerifiedForPayment && (
+            <div className="digital-id-qr">
+              <img src={`/api/services/verify-document/${encodeURIComponent(application.applicationId)}/qr`} alt="Scan to verify this digital ID" />
+              <small>Scan to verify</small>
+            </div>
+          )}
+          <span className={`digital-id-stamp${isVerifiedForPayment ? '' : ' digital-id-stamp--pending'}`}>
+            <span>E-KEBELE</span>
+            <span>{isVerifiedForPayment ? 'PORTAL VERIFIED' : 'NOT VERIFIED'}</span>
+          </span>
         </footer>
       </section>
 
@@ -95,7 +128,11 @@ const DigitalIDCard = () => {
         .digital-id-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 12px; margin-top: 18px; }
         .digital-id-blue { color: #0b5ed7; }
         .digital-id-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 24px; border-top: 1px solid #d7dee8; color: #526174; font-size: 10px; }
-        .digital-id-stamp { padding: 8px; border: 2px solid #059669; border-radius: 50%; color: #059669; font-size: 9px; font-weight: 800; transform: rotate(-10deg); }
+        .digital-id-qr { display: grid; justify-items: center; gap: 3px; }
+        .digital-id-qr img { display: block; width: 96px; height: 96px; }
+        .digital-id-qr small { color: #526174; font-size: 8px; font-weight: 700; }
+        .digital-id-stamp { display: grid; gap: 2px; padding: 9px 7px; border: 2px solid #059669; border-radius: 50%; color: #059669; font-size: 7px; font-weight: 800; text-align: center; transform: rotate(-10deg); }
+        .digital-id-stamp--pending { border-color: #b45309; color: #b45309; }
         @media (max-width: 560px) { .digital-id-body { grid-template-columns: 1fr; } .digital-id-photo { margin: 0 auto; } .digital-id-header h1 { font-size: 14px; } .digital-id-grid { grid-template-columns: 1fr; } }
         @media print { @page { size: A4 portrait; margin: 12mm; } *, *::before, *::after { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } body * { visibility: hidden; } #printable-id-card, #printable-id-card * { visibility: visible; } .print-hidden, .sticky { display: none !important; } .digital-id-page { min-height: auto; padding: 0; background: #fff !important; } #printable-id-card { position: absolute; left: 0; top: 0; width: 100%; max-width: 680px; box-shadow: none; } .digital-id-header { color: #fff !important; background: #0b5ed7 !important; border-bottom-color: #f4c430 !important; } .digital-id-flag { border-color: #fff !important; } .digital-id-flag span:nth-child(1) { background: #078930 !important; } .digital-id-flag span:nth-child(2) { background: #fcd116 !important; } .digital-id-flag span:nth-child(3) { background: #da121a !important; } .digital-id-photo { background: #e8eef7 !important; } .digital-id-stamp { color: #059669 !important; border-color: #059669 !important; } }
       `}</style>

@@ -156,6 +156,30 @@
   gap: 12px;
 }
 
+.about-step-card:not(:last-child)::after {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  right: -1.35rem;
+  display: grid;
+  width: 1.5rem;
+  height: 1.5rem;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff;
+  color: #2563eb;
+  content: '→';
+  font-size: 1.2rem;
+  font-weight: 700;
+  transform: translateY(-50%);
+}
+
+@media (max-width: 767px) {
+  .about-step-card::after {
+    display: none !important;
+  }
+}
+
 @media (max-width: 900px) {
   .about-main {
     padding: 24px 20px;

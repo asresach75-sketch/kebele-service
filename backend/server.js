@@ -2,10 +2,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
-const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const nodemailer = require('nodemailer');
-require('dotenv').config();
+require('dotenv').config({ path: path.join(__dirname, '.env') });
+const { assertSecurityConfiguration } = require('./utils/securityConfig');
+const multer = require('multer');
 
 const app = express();
 
@@ -25,18 +26,34 @@ const emailTransport = nodemailer.createTransport({
 
 app.locals.emailTransport = emailTransport;
 
-app.use(cors());
-app.use(express.json());
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+const securityConfig = assertSecurityConfiguration();
+app.use(cors({
+  origin(origin, callback) {
+    if (!origin || securityConfig.allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(null, false);
+  }
+}));
+app.use(express.json({ limit: '100kb' }));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
+  setHeaders: (res, filePath) => {
+    if (path.extname(filePath).toLowerCase() === '.pdf') {
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'inline');
+    }
+  }
+}));
 
-const mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/ekebele';
+const mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/ekebele_db';
 
 const userRoutes = require('./routes/userRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
-const User = require('./models/User');
 const Service = require('./models/ServiceRequest');
 const feeRoutes = require('./routes/feeRoutes');
 const marriageRoutes = require('./routes/marriageRoutes');
+const birthCertificateRoutes = require('./routes/birthCertificateRoutes');
+const auditRoutes = require('./routes/auditRoutes');
 const createDocumentPdf = require('./utils/documentPdf');
 
 app.use('/api/users', userRoutes);
@@ -44,6 +61,8 @@ app.use('/api/services', serviceRoutes);
 app.use('/api/workflow', serviceRoutes);
 app.use('/api/fees', feeRoutes);
 app.use('/api/vital', marriageRoutes);
+app.use('/api/birth-certificate', birthCertificateRoutes);
+app.use('/api/admin/audit-logs', auditRoutes);
 // applicationRoutes የሚለው ጠፍቷል ምክንያቱም ፋይሉ የለም፣ ሁሉም በ serviceRoutes በኩል ይስተናገዳል
 
 // የተፈቀደን ሰነድ ወይም ፒዲኤፍ ፋይል በዳውንሎድ ለማግኘት የሚያስችል ራውት
@@ -57,13 +76,13 @@ const downloadDocument = async (req, res) => {
     if (!service) {
       return res.status(404).json({ success: false, message: 'Document not found' });
     }
+    if (service.status !== 'COMPLETED') {
+      return res.status(403).json({ success: false, message: 'The document is not yet ready for release.' });
+    }
 
     const filePath = path.join(__dirname, 'uploads', `${service.applicationId}.pdf`);
-
-    if (!fs.existsSync(filePath) || !fs.readFileSync(filePath).subarray(0, 5).equals(Buffer.from('%PDF-'))) {
-      const pdfBuffer = await createDocumentPdf(service);
-      fs.writeFileSync(filePath, pdfBuffer);
-    }
+    const pdfBuffer = await createDocumentPdf(service);
+    fs.writeFileSync(filePath, pdfBuffer);
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="Kebele_Document_${service.applicationId}.pdf"`);
@@ -77,57 +96,13 @@ const downloadDocument = async (req, res) => {
 app.get('/api/downloads/:id', downloadDocument);
 app.get('/api/applications/download/:id', downloadDocument);
 
-const multer = require('multer');
-
-const seedAdminUser = async () => {
-  try {
-    const defaultUsers = [
-      { email: 'admin@gmail.com', phone: '0911111111', password: 'admin@1121', role: 'admin', fullName: 'Administrator' },
-      { email: 'officer@gmail.com', phone: '0912345678', password: 'officer@1121', role: 'officer', fullName: 'Kebele Officer' },
-      { email: 'finance@gmail.com', phone: '0923456789', password: 'finance@1121', role: 'finance', fullName: 'Finance Officer' },
-      { email: 'user@gmail.com', phone: '0934567890', password: 'user@1121', role: 'user', fullName: 'Demo User' }
-    ];
-
-    for (const userConfig of defaultUsers) {
-      const existingUser = await User.findOne({ email: userConfig.email });
-
-      if (!existingUser) {
-        await User.create({
-          fullName: userConfig.fullName,
-          email: userConfig.email,
-          phone: userConfig.phone,
-          password: await bcrypt.hash(userConfig.password, 10),
-          role: userConfig.role
-        });
-        console.log('✅ Default user created:', userConfig.email, 'with role:', userConfig.role);
-        continue;
-      }
-
-      const storedPassword = typeof existingUser.password === 'string' ? existingUser.password : '';
-      const legacyPlainTextMatch = storedPassword && storedPassword === userConfig.password;
-      const hashedMatches = storedPassword ? await bcrypt.compare(userConfig.password, storedPassword).catch(() => false) : false;
-
-      if (existingUser.role !== userConfig.role || !storedPassword || (!hashedMatches && !legacyPlainTextMatch)) {
-        existingUser.role = userConfig.role;
-        existingUser.fullName = userConfig.fullName;
-        existingUser.phone = existingUser.phone || userConfig.phone;
-        existingUser.password = await bcrypt.hash(userConfig.password, 10);
-        await existingUser.save();
-        console.log('🔐 User synchronized:', userConfig.email);
-      } else if (legacyPlainTextMatch) {
-        existingUser.phone = existingUser.phone || userConfig.phone;
-        existingUser.password = await bcrypt.hash(userConfig.password, 10);
-        await existingUser.save();
-        console.log('🔐 Legacy password upgraded for:', userConfig.email);
-      }
-    }
-  } catch (err) {
-    console.error('Error seeding default users:', err);
-  }
-};
-
 app.get('/', (req, res) => {
   res.send('API is running...');
+});
+
+app.get('/api/health', (req, res) => {
+  const connected = mongoose.connection.readyState === 1;
+  res.status(connected ? 200 : 503).json({ database: { connected } });
 });
 
 const PORT = process.env.PORT || 5000;
@@ -136,7 +111,6 @@ const startServer = async () => {
   try {
     await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 5000 });
     console.log('✅ MongoDB Connected!');
-    await seedAdminUser();
     app.listen(PORT, () => {
       console.log(`🚀 Backend running on port ${PORT}`);
     });
@@ -163,14 +137,24 @@ app.use((err, req, res, next) => {
     return res.status(400).json({ success: false, message: 'Invalid JSON payload sent by the client.' });
   }
 
+  if (err.code === 'UNSUPPORTED_FILE_TYPE') {
+    return res.status(400).json({ success: false, message: err.message });
+  }
+
   if (err instanceof multer.MulterError) {
     const message = err.code === 'LIMIT_FILE_SIZE'
-      ? 'File too large. Please upload files smaller than 50MB.'
+      ? 'File too large. Please upload files no larger than 5MB.'
+      : err.code === 'LIMIT_UNEXPECTED_FILE'
+        ? `Unexpected file field "${err.field}". Ensure the frontend and backend use matching upload field names.`
       : err.message;
     return res.status(400).json({ success: false, message });
   }
   if (err.code === 'LIMIT_FILE_SIZE') {
-    return res.status(400).json({ success: false, message: 'File too large. Please upload files smaller than 50MB.' });
+    return res.status(400).json({ success: false, message: 'File too large. Please upload files no larger than 5MB.' });
   }
-  res.status(500).json({ success: false, message: err.message || 'Server error' });
+  const statusCode = err.status === 413 ? 413 : 500;
+  res.status(statusCode).json({
+    success: false,
+    message: statusCode === 413 ? 'Request body is too large.' : err.message || 'Server error'
+  });
 });

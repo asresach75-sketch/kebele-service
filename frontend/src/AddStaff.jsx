@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import './AddStaff.css';
 
 const initialForm = { fullName: '', email: '', phone: '', role: 'officer', password: '' };
 
@@ -33,7 +34,7 @@ const AddStaff = () => {
     setMessage('');
     try {
       await axios.post('/api/users/staff', formData, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        headers: { Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}` }
       });
       navigate('/admin-dashboard');
     } catch (error) {
@@ -44,25 +45,44 @@ const AddStaff = () => {
   };
 
   return (
-    <main className="min-h-screen bg-slate-100 p-6 sm:p-10">
-      <section className="mx-auto max-w-2xl rounded-xl bg-white p-6 shadow-md sm:p-8">
-        <div className="mb-6 flex items-center justify-between gap-4 border-b pb-4">
-          <h1 className="text-xl font-bold text-gray-800">Add New Staff / አዲስ ሰራተኛ</h1>
-          <button type="button" onClick={() => navigate('/admin-dashboard')} className="rounded-lg bg-slate-700 px-4 py-2 text-xs font-bold text-white hover:bg-slate-800">
-            ← Back to Dashboard
+    <div className="add-staff-page">
+      <header className="add-staff-header">
+        <div className="add-staff-header-inner">
+          <div className="add-staff-brand">
+            <span className="add-staff-brand-mark" aria-hidden="true">ኢ</span>
+            <div><strong>ኢ-ቀበሌ / E-Kebele</strong><span>Admin Portal</span></div>
+          </div>
+          <button type="button" onClick={() => navigate('/admin-dashboard')} className="add-staff-dashboard-link">
+            Dashboard
           </button>
         </div>
-        {message && <p className="mb-4 rounded-lg bg-red-100 p-3 text-sm font-semibold text-red-700">{message}</p>}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <label className="block text-sm font-bold">Full Name / ሙሉ ስም<input className={`mt-1 w-full rounded-lg border p-3 font-normal ${errors.fullName ? 'border-red-500' : ''}`} name="fullName" value={formData.fullName} onChange={handleChange} required />{errors.fullName && <small className="text-red-600">{errors.fullName}</small>}</label>
-          <label className="block text-sm font-bold">Email / ኢሜይል (Optional)<input className={`mt-1 w-full rounded-lg border p-3 font-normal ${errors.email ? 'border-red-500' : ''}`} type="email" name="email" value={formData.email} onChange={handleChange} />{errors.email && <small className="text-red-600">{errors.email}</small>}</label>
-          <label className="block text-sm font-bold">Phone / ስልክ<input className={`mt-1 w-full rounded-lg border p-3 font-normal ${errors.phone ? 'border-red-500' : ''}`} type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="0911223344" required />{errors.phone && <small className="text-red-600">{errors.phone}</small>}</label>
-          <label className="block text-sm font-bold">Role / የስራ ድርሻ<select className="mt-1 w-full rounded-lg border p-3 font-normal" name="role" value={formData.role} onChange={handleChange}><option value="officer">Officer</option><option value="finance">Finance Officer</option><option value="admin">Administrator</option></select></label>
-          <label className="block text-sm font-bold">Temporary Password / ጊዜያዊ የይለፍ ቃል<input className={`mt-1 w-full rounded-lg border p-3 font-normal ${errors.password ? 'border-red-500' : ''}`} type="password" name="password" value={formData.password} onChange={handleChange} required minLength={8} />{errors.password && <small className="text-red-600">{errors.password}</small>}</label>
-          <button type="submit" disabled={submitting} className="w-full rounded-lg bg-blue-700 py-3 font-bold text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60">{submitting ? 'Saving...' : 'Save Staff Account'}</button>
-        </form>
-      </section>
-    </main>
+      </header>
+      <main className="add-staff-main">
+        <section className="add-staff-card">
+          <div className="add-staff-card-heading">
+            <div>
+              <span className="add-staff-eyebrow">STAFF MANAGEMENT</span>
+              <h1>Add New Staff / አዲስ ሰራተኛ</h1>
+            </div>
+            <button type="button" onClick={() => navigate('/admin-dashboard')} className="add-staff-back-link">
+              ← Back
+            </button>
+          </div>
+          {message && <p className="add-staff-error" role="alert">{message}</p>}
+          <form onSubmit={handleSubmit} className="add-staff-form">
+            <label>Full Name / ሙሉ ስም<input className={errors.fullName ? 'has-error' : ''} name="fullName" value={formData.fullName} onChange={handleChange} required />{errors.fullName && <small>{errors.fullName}</small>}</label>
+            <label>Email / ኢሜይል (Optional)<input className={errors.email ? 'has-error' : ''} type="email" name="email" value={formData.email} onChange={handleChange} />{errors.email && <small>{errors.email}</small>}</label>
+            <label>Phone / ስልክ<input className={errors.phone ? 'has-error' : ''} type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="0911223344" required />{errors.phone && <small>{errors.phone}</small>}</label>
+            <label>Role / የስራ ድርሻ<select name="role" value={formData.role} onChange={handleChange}><option value="officer">Officer</option><option value="finance">Finance Officer</option><option value="admin">Administrator</option></select></label>
+            <label>Temporary Password / ጊዜያዊ የይለፍ ቃል<input className={errors.password ? 'has-error' : ''} type="password" name="password" value={formData.password} onChange={handleChange} required minLength={8} />{errors.password && <small>{errors.password}</small>}</label>
+            <button type="submit" disabled={submitting} className="add-staff-submit">{submitting ? 'Saving...' : 'Save Staff Account'}</button>
+          </form>
+        </section>
+      </main>
+      <footer className="add-staff-footer">
+        © 2026 E-Kebele Portal · የቀበሌ ዲጂታል አገልግሎት ስርዓት
+      </footer>
+    </div>
   );
 };
 

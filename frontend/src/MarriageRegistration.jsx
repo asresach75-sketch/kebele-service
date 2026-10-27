@@ -17,6 +17,22 @@ const fieldClass = 'w-full rounded-lg border border-gray-300 bg-white px-3 py-2 
 const labelClass = 'mb-1 block text-xs font-bold text-gray-700';
 const namePattern = /^[a-zA-Z\u1200-\u137F\s]+$/;
 const phonePattern = /^(09|07)\d{8}$/;
+const parseDateOnly = (value) => {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value || ''));
+  if (!match) return null;
+  const [, yearText, monthText, dayText] = match;
+  const date = new Date(Date.UTC(Number(yearText), Number(monthText) - 1, Number(dayText)));
+  return date.toISOString().slice(0, 10) === value ? date : null;
+};
+const ageAtDate = (dateOfBirth, eventDate) => {
+  let age = eventDate.getUTCFullYear() - dateOfBirth.getUTCFullYear();
+  if (
+    eventDate.getUTCMonth() < dateOfBirth.getUTCMonth()
+    || (eventDate.getUTCMonth() === dateOfBirth.getUTCMonth()
+      && eventDate.getUTCDate() < dateOfBirth.getUTCDate())
+  ) age -= 1;
+  return age;
+};
 
 const MarriageRegistration = () => {
   const { lang, t } = useLanguage();
@@ -77,8 +93,19 @@ const MarriageRegistration = () => {
     ['husbandPhone', 'wifePhone', 'witness1Phone', 'witness2Phone', 'witness3Phone'].forEach((field) => {
       if (formData[field].trim() && !phonePattern.test(formData[field].trim())) nextErrors[field] = copy.invalidPhone;
     });
-    ['husbandDob', 'wifeDob', 'marriageDate'].forEach((field) => {
-      if (formData[field] && new Date(formData[field]) > new Date()) nextErrors[field] = copy.invalidDate;
+    const marriageDate = parseDateOnly(formData.marriageDate);
+    const today = new Date();
+    const todayDate = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
+    if (!marriageDate || marriageDate > todayDate) nextErrors.marriageDate = copy.invalidDate;
+    ['husband', 'wife'].forEach((person) => {
+      const birthDate = parseDateOnly(formData[`${person}Dob`]);
+      if (!birthDate || birthDate > todayDate || (marriageDate && birthDate > marriageDate)) {
+        nextErrors[`${person}Dob`] = copy.invalidDate;
+      } else if (marriageDate && ageAtDate(birthDate, marriageDate) < 18) {
+        nextErrors[`${person}Dob`] = lang === 'am'
+          ? 'በጋብቻው ቀን ቢያንስ 18 ዓመት መሆን አለበት።'
+          : 'Each spouse must be at least 18 on the marriage date.';
+      }
     });
     Object.entries(files).forEach(([field, file]) => {
       if (!file) nextErrors[field] = copy.requiredFile;
@@ -103,7 +130,7 @@ const MarriageRegistration = () => {
     Object.entries(files).forEach(([key, file]) => { if (file) data.append(key, file); });
 
     try {
-      const response = await axios.post('/api/vital/marriage-registration', data, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+      const response = await axios.post('/api/vital/marriage-registration', data, { headers: { Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}` } });
       setSubmissionSucceeded(true);
       setMessage(`${copy.success} ${response.data.applicationId}`);
       setTimeout(() => navigate(`/marriage-certificate/${encodeURIComponent(response.data.applicationId)}`), 1800);

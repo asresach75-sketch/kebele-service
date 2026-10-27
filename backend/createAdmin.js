@@ -1,34 +1,47 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const path = require('path');
 const User = require('./models/User');
+const { isStrongPassword } = require('./utils/passwordValidation');
 
-mongoose.connect('mongodb://localhost:27017/ekebele');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const createAdminUser = async () => {
-  try {
-    const email = 'admin@gmail.com';
-    const password = 'admin@1121';
-    const phone = '0911111111';
+  const fullName = String(process.env.ADMIN_FULL_NAME || '').trim();
+  const email = String(process.env.ADMIN_EMAIL || '').trim().toLowerCase();
+  const phone = String(process.env.ADMIN_PHONE || '').trim();
+  const password = process.env.ADMIN_PASSWORD || '';
 
-    await User.deleteOne({ email });
+  if (
+    !fullName ||
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
+    !/^(09|07)\d{8}$/.test(phone) ||
+    !isStrongPassword(password)
+  ) {
+    throw new Error('Set ADMIN_FULL_NAME, ADMIN_EMAIL, ADMIN_PHONE, and a strong ADMIN_PASSWORD in backend/.env.');
+  }
 
-    await User.create({
-      fullName: 'System Admin',
+  await mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/ekebele_db');
+  await User.findOneAndUpdate(
+    { email },
+    {
+      fullName,
       email,
       phone,
       password: await bcrypt.hash(password, 10),
-      role: 'admin'
-    });
-
-    console.log('✅ አድሚኑ በተሳካ ሁኔታ ተፈጥሯል!');
-    console.log('ኢሜይል: admin@gmail.com');
-    console.log('ፓስወርድ: admin@1121');
-    console.log('ስልክ: 0911111111');
-    mongoose.connection.close();
-  } catch (err) {
-    console.error('ስህተት ተፈጥሯል:', err);
-    mongoose.connection.close();
-  }
+      role: 'admin',
+      isBlocked: false,
+    },
+    { upsert: true, new: true, runValidators: true, setDefaultsOnInsert: true }
+  );
+  console.log(`Admin account configured for ${email}.`);
 };
 
-createAdminUser();
+createAdminUser()
+  .catch((error) => {
+    console.error('Admin account setup failed:', error.message);
+    process.exitCode = 1;
+  })
+  .finally(async () => {
+    await mongoose.disconnect();
+  });

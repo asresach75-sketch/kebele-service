@@ -1,0 +1,182 @@
+.birth-registration-page {
+  min-height: calc(100vh - 72px);
+  padding: 40px 20px;
+  background: #f1f5f9;
+}
+
+.birth-registration-card {
+  width: min(100%, 1080px);
+  margin: 0 auto;
+  padding: 32px;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 12px 32px rgb(15 23 42 / 8%);
+}
+
+.birth-registration-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 26px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.birth-registration-header h1 {
+  margin: 0 0 8px;
+  color: #0f172a;
+  font-size: 24px;
+  line-height: 1.3;
+}
+
+.birth-registration-header p {
+  margin: 0 0 10px;
+  color: #64748b;
+}
+
+.birth-registration-back {
+  flex: 0 0 auto;
+  color: #1d4ed8;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.birth-registration-back:hover {
+  text-decoration: underline;
+}
+
+.birth-registration-message {
+  margin-bottom: 20px;
+  padding: 14px;
+  border: 1px solid #a7f3d0;
+  border-radius: 10px;
+  background: #ecfdf5;
+  color: #065f46;
+  overflow-wrap: anywhere;
+}
+
+.birth-registration-form {
+  display: grid;
+  gap: 24px;
+}
+
+.birth-registration-section {
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.birth-registration-section h2 {
+  margin: 0 0 18px;
+  padding-left: 10px;
+  border-left: 4px solid #2563eb;
+  color: #1e3a8a;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.birth-registration-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+.birth-registration-field {
+  min-width: 0;
+}
+
+.birth-registration-field label {
+  display: block;
+  margin-bottom: 6px;
+  color: #334155;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.birth-registration-field input:not([type='file']),
+.birth-registration-field select {
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  color: #0f172a;
+  font: inherit;
+}
+
+.birth-registration-field input:focus,
+.birth-registration-field select:focus {
+  border-color: #2563eb;
+  outline: 3px solid rgb(37 99 235 / 16%);
+}
+
+.birth-registration-documents {
+  background: #f8fafc;
+}
+
+.birth-registration-hint {
+  margin: 14px 0 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.birth-registration-submit {
+  min-height: 48px;
+  padding: 12px 22px;
+  border: 0;
+  border-radius: 10px;
+  background: #1d4ed8;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  transition: background-color 150ms ease;
+}
+
+.birth-registration-submit:hover:not(:disabled) {
+  background: #1e40af;
+}
+
+.birth-registration-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+@media (min-width: 640px) {
+  .birth-registration-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .birth-registration-grid-three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 639px) {
+  .birth-registration-page {
+    padding: 20px 12px;
+  }
+
+  .birth-registration-card {
+    padding: 20px 16px;
+  }
+
+  .birth-registration-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .birth-registration-header h1 {
+    font-size: 21px;
+  }
+
+  .birth-registration-section {
+    padding: 16px 12px;
+  }
+}

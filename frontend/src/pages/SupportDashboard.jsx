@@ -11,7 +11,7 @@ export default function SupportDashboard() {
 
   const fetchFeedbacks = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token') || localStorage.getItem('token');
       const res = await axios.get('/api/services/feedbacks', {
         headers: { Authorization: `Bearer ${token}` }
       });
