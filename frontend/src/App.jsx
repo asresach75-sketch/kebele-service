@@ -40,6 +40,7 @@ function RoutedApp({ darkMode, toggleDarkMode }) {
     '/login',
     '/admin-dashboard',
     '/admin-applications',
+    '/admin-users',
     '/admin-logs',
     '/add-staff',
     '/user-feedbacks',
@@ -49,7 +50,7 @@ function RoutedApp({ darkMode, toggleDarkMode }) {
     '/digital-id-card',
   ];
   const shouldHideHeader = hideHeaderRoutes.includes(location.pathname);
-  const hideFooterRoutes = ['/login', '/admin-dashboard', '/admin-applications', '/admin-logs', '/add-staff', '/user-feedbacks', '/manage-fees'];
+  const hideFooterRoutes = ['/login', '/admin-dashboard', '/admin-applications', '/admin-users', '/admin-logs', '/add-staff', '/user-feedbacks', '/manage-fees'];
   const shouldHideFooter = hideFooterRoutes.includes(location.pathname);
 
   return (
@@ -82,6 +83,7 @@ function RoutedApp({ darkMode, toggleDarkMode }) {
         <Route path="/marriage-certificate/:applicationId" element={<MarriageCertificate />} />
         <Route path="/admin-dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
         <Route path="/admin-applications" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
+        <Route path="/admin-users" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
         <Route path="/admin-logs" element={<ProtectedRoute allowedRoles={['admin']}><AdminAuditLogs /></ProtectedRoute>} />
         <Route path="/add-staff" element={<ProtectedRoute allowedRoles={['admin']}><AddStaff /></ProtectedRoute>} />
         <Route path="/user-feedbacks" element={<ProtectedRoute allowedRoles={['admin']}><UserFeedbacks /></ProtectedRoute>} />

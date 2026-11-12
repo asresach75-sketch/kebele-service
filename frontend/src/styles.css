@@ -48,11 +48,23 @@ body {
   color: var(--text);
 }
 
+#root,
+.app {
+  width: 100%;
+  min-width: 0;
+}
+
 button,
 input,
 textarea,
 select {
   font: inherit;
+}
+
+input,
+textarea,
+select {
+  max-width: 100%;
 }
 
 button {

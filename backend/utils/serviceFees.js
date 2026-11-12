@@ -2,7 +2,7 @@ const ServiceFee = require('../models/ServiceFee');
 
 const DEFAULT_SERVICE_FEES = [
   { serviceType: 'New ID', feeAmount: 100 },
-  { serviceType: 'ID Renewal', feeAmount: 150 },
+  { serviceType: 'ID Renewal', feeAmount: 90 },
   { serviceType: 'Vital Events', feeAmount: 200 },
 ];
 

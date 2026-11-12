@@ -211,6 +211,11 @@ function DeathRegistration() {
   }
 
   function clearForm() {
+    if (
+      Object.values(formData).some(Boolean)
+      && !window.confirm('Clear all entered information and selected files? / ያስገቡትን መረጃ እና የመረጡትን ፋይሎች ማጽዳት ይፈልጋሉ?')
+    ) return;
+
     setFormData({
       reporterName: '', deceasedName: '', dateOfDeath: '', placeOfDeath: '',
       phone: '', phoneNumber: '', region: '', zone: '', woreda: '', kebele: '',

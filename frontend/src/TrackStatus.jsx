@@ -95,6 +95,7 @@ function TrackStatus() {
   const text = (english, amharic) => (isAmharic ? amharic : english);
   const [query, setQuery] = useState('');
   const [result, setResult] = useState(null);
+  const [applicationIdCopyStatus, setApplicationIdCopyStatus] = useState('');
   const [error, setError] = useState('');
   const [searching, setSearching] = useState(false);
   const [telebirrPhone, setTelebirrPhone] = useState('');
@@ -115,6 +116,7 @@ function TrackStatus() {
     }
 
     setError('');
+    setApplicationIdCopyStatus('');
     setResult(null);
     setSearching(true);
     try {
@@ -150,6 +152,17 @@ function TrackStatus() {
       }
     } finally {
       setSearching(false);
+    }
+  };
+
+  const copyApplicationId = async () => {
+    if (!result?.applicationId) return;
+
+    try {
+      await navigator.clipboard.writeText(result.applicationId);
+      setApplicationIdCopyStatus('success');
+    } catch (copyError) {
+      setApplicationIdCopyStatus('error');
     }
   };
 
@@ -554,6 +567,24 @@ function TrackStatus() {
 
         {result && (
           <div className="track-result">
+            {result.applicationId && (
+              <div className="track-application-id">
+                <div>
+                  <strong>{text('Application ID', 'የማመልከቻ ቁጥር')}</strong>
+                  <code>{result.applicationId}</code>
+                </div>
+                <button type="button" onClick={copyApplicationId} className="track-copy-id-button">
+                  {applicationIdCopyStatus === 'success'
+                    ? text('Copied', 'ተቀድቷል')
+                    : text('Copy ID', 'ቁጥሩን ኮፒ አድርግ')}
+                </button>
+                {applicationIdCopyStatus === 'error' && (
+                  <p className="track-copy-id-feedback" role="status">
+                    {text('Unable to copy. Please select and copy the ID manually.', 'ኮፒ ማድረግ አልተቻለም። እባክዎ ቁጥሩን በእጅ ይምረጡና ኮፒ ያድርጉ።')}
+                  </p>
+                )}
+              </div>
+            )}
             <p><strong>{text('Service', 'አገልግሎት')}:</strong> {getServiceLabel(result.serviceType)}</p>
             <p><strong>{text('Status', 'ሁኔታ')}:</strong> {getStatusLabel(result.status)}</p>
             <p><strong>{text('Name', 'ስም')}:</strong> {result.fullName || result.parentName || result.husbandName || result.childName || 'N/A'}</p>

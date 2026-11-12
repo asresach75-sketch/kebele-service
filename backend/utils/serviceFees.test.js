@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { getFeeCategory } = require('./serviceFees');
+const { DEFAULT_SERVICE_FEES, getFeeCategory } = require('./serviceFees');
 
 test('maps ID and civil event service types to the admin fee categories', () => {
   assert.equal(getFeeCategory('NEW_ID_CARD'), 'New ID');
@@ -11,4 +11,9 @@ test('maps ID and civil event service types to the admin fee categories', () => 
   assert.equal(getFeeCategory('DIVORCE_REGISTRATION'), 'Vital Events');
   assert.equal(getFeeCategory('DEATH_REGISTRATION'), 'Vital Events');
   assert.equal(getFeeCategory('UNKNOWN'), null);
+});
+
+test('defaults the ID renewal fee to 90 ETB', () => {
+  const renewalFee = DEFAULT_SERVICE_FEES.find((fee) => fee.serviceType === 'ID Renewal');
+  assert.equal(renewalFee?.feeAmount, 90);
 });

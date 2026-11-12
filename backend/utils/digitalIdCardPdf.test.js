@@ -22,6 +22,7 @@ test('creates a digital ID PDF containing its online verification QR code', asyn
   const pdfContent = pdf.toString('latin1');
 
   assert.equal(pdf.subarray(0, 5).toString(), '%PDF-');
+  assert.equal((pdfContent.match(/\/Type\s*\/Page\b/g) || []).length, 1);
   assert.match(pdfContent, /\/Subtype\s*\/Image/);
   assert.match(pdfContent, /0\.027450980392156862 0\.5372549019607843 0\.18823529411764706 scn/);
   assert.match(pdfContent, /0\.9882352941176471 0\.8666666666666667 0\.03529411764705882 scn/);

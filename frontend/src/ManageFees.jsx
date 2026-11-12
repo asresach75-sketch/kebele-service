@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import AdminPageLayout from './AdminPageLayout';
 import './ManageFees.css';
 
 function ManageFees() {
@@ -9,8 +9,6 @@ function ManageFees() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(null);
-  const navigate = useNavigate();
-
   useEffect(() => {
     axios.defaults.headers.common.Authorization = `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`;
     axios.get('/api/fees')
@@ -38,29 +36,13 @@ function ManageFees() {
   };
 
   return (
-    <div className="manage-fees-page">
-      <header className="manage-fees-header">
-        <div className="manage-fees-header-inner">
-          <div className="manage-fees-brand">
-            <span className="manage-fees-brand-mark" aria-hidden="true">ኢ</span>
-            <div><strong>ኢ-ቀበሌ / E-Kebele</strong><span>Admin Portal</span></div>
-          </div>
-          <button type="button" onClick={() => navigate('/admin-dashboard')} className="manage-fees-dashboard-link">
-            Dashboard
-          </button>
-        </div>
-      </header>
-      <main className="manage-fees-main">
-        <div className="manage-fees-title">
-          <div>
-            <span className="manage-fees-eyebrow">FINANCE MANAGEMENT</span>
-            <h1>Service Fee Adjustment / የአገልግሎት ክፍያ ማስተካከያ</h1>
-            <p>Manage and update service fees for citizens.</p>
-          </div>
-          <button type="button" onClick={() => navigate('/admin-dashboard')} className="manage-fees-back-link">
-            ← Back to Dashboard
-          </button>
-        </div>
+    <AdminPageLayout
+      activePage="fees"
+      title="Service Fees"
+      description="Manage service fees."
+    >
+      <main className="manage-fees-main admin-page-content">
+        <span className="manage-fees-eyebrow">FINANCE MANAGEMENT</span>
         <section className="manage-fees-card" aria-label="Service fees">
           {message && <p className="manage-fees-message" role="status">{message}</p>}
           {error && <p className="manage-fees-error" role="alert">{error}</p>}
@@ -68,10 +50,7 @@ function ManageFees() {
           {!fees.length && !error && <p className="manage-fees-loading">Loading service fees...</p>}
         </section>
       </main>
-      <footer className="manage-fees-footer">
-        © 2026 E-Kebele Portal · የቀበሌ ዲጂታል አገልግሎት ስርዓት
-      </footer>
-    </div>
+    </AdminPageLayout>
   );
 }
 

@@ -26,10 +26,70 @@ const heroImages = [
   },
 ];
 
+const galleryImages = [
+  {
+    src: '/images/ethiopian-kebele-office-hero.png',
+    altEn: 'Citizens and staff at a digital Kebele service desk',
+    altAm: 'ዜጎችና ሰራተኞች በዲጂታል ቀበሌ አገልግሎት ዴስክ ላይ',
+    titleEn: 'Digital service desk',
+    titleAm: 'ዲጂታል የአገልግሎት ዴስክ',
+  },
+  {
+    src: '/images/home_hero.jpg',
+    altEn: 'An office worker using a computer at her desk',
+    altAm: 'የቢሮ ሰራተኛ በዴስክዋ ላይ ኮምፒውተር ስትጠቀም',
+    titleEn: 'Computer-assisted service',
+    titleAm: 'በኮምፒውተር የታገዘ አገልግሎት',
+  },
+  {
+    src: '/images/hero_ethiopian_digital.jpg',
+    altEn: 'A woman using a laptop outdoors',
+    altAm: 'አንዲት ሴት ከቤት ውጭ ላፕቶፕ ስትጠቀም',
+    titleEn: 'Access from anywhere',
+    titleAm: 'ከየትኛውም ቦታ አገልግሎት ማግኘት',
+  },
+  {
+    src: '/images/ethiopian-digital-operations.png',
+    altEn: 'Digital operations staff monitoring computer screens',
+    altAm: 'የዲጂታል ኦፕሬሽን ሰራተኞች የኮምፒውተር ስክሪኖችን ሲከታተሉ',
+    titleEn: 'Digital operations',
+    titleAm: 'ዲጂታል ኦፕሬሽን',
+  },
+  {
+    src: '/images/ethiopian-government-meeting.webp',
+    altEn: 'Ethiopian officials gathered for a government meeting',
+    altAm: 'የኢትዮጵያ ባለስልጣናት በመንግስት ስብሰባ ላይ',
+    titleEn: 'Public administration',
+    titleAm: 'የህዝብ አስተዳደር',
+  },
+  {
+    src: '/images/officer_dashboard_banner.jpg',
+    altEn: 'Two colleagues reviewing information together at a laptop',
+    altAm: 'ሁለት ባልደረቦች በላፕቶፕ ላይ መረጃን አብረው ሲመለከቱ',
+    titleEn: 'Staff collaboration',
+    titleAm: 'የሰራተኞች ትብብር',
+  },
+  {
+    src: '/images/finance_dashboard_banner.jpg',
+    altEn: 'A team meeting in a public-service office',
+    altAm: 'በህዝብ አገልግሎት ቢሮ የቡድን ስብሰባ',
+    titleEn: 'Service team coordination',
+    titleAm: 'የአገልግሎት ቡድን ቅንጅት',
+  },
+  {
+    src: '/kebele-hero-real.jpg',
+    altEn: 'People discussing information around a tablet in an office',
+    altAm: 'ሰዎች በቢሮ ውስጥ በታብሌት ዙሪያ መረጃን ሲወያዩ',
+    titleEn: 'Digital tools at work',
+    titleAm: 'በስራ ላይ ዲጂታል መሳሪያዎች',
+  },
+];
+
 const Home = () => {
   const { lang, t } = useLanguage();
   const isAmharic = lang === 'am';
   const [currentHeroImage, setCurrentHeroImage] = useState(0);
+  const [failedHeroImages, setFailedHeroImages] = useState([]);
   const [showMaintenanceNotice, setShowMaintenanceNotice] = useState(true);
   const [openFaq, setOpenFaq] = useState(null);
 
@@ -58,12 +118,16 @@ const Home = () => {
         getStarted: 'ይጀምሩ',
         closeNotice: 'የማሳወቂያ ሳጥኑን ዝጋ',
         photoCredits: 'የፎቶ ምንጮች',
+        galleryTitle: 'የኢ-ቀበሌ አገልግሎት ማዕከል',
+        gallerySubtitle: 'በዲጂታል ቴክኖሎጂ የታገዙ የህዝብ አገልግሎቶችና የቢሮ ስራዎች',
       }
     : {
         serviceDescription: 'Digital public service',
         getStarted: 'Get started',
         closeNotice: 'Dismiss maintenance notice',
         photoCredits: 'Photo credits',
+        galleryTitle: 'E-Kebele Service Gallery',
+        gallerySubtitle: 'Public services and office work supported by digital technology',
       };
 
   const faqs = isAmharic
@@ -97,9 +161,9 @@ const Home = () => {
         </div>
       )}
 
-      <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <main className="w-full">
         <section
-          className="relative mb-8 flex h-[380px] items-center justify-center overflow-hidden rounded-2xl shadow-2xl"
+          className="relative mx-auto flex h-[300px] w-full items-center justify-center overflow-hidden shadow-2xl sm:my-6 sm:w-[calc(100%-3rem)] sm:rounded-2xl md:h-[480px] lg:h-[550px]"
           aria-roledescription="carousel"
           aria-label={isAmharic ? 'የቀበሌ አገልግሎት ፎቶዎች' : 'Kebele service photo slideshow'}
         >
@@ -108,38 +172,57 @@ const Home = () => {
             style={{ transform: `translateX(-${currentHeroImage * 100}%)` }}
           >
             {heroImages.map((image, index) => (
-              <div className="home-hero-slide" key={image.src}>
-                <img
-                  src={image.src}
-                  alt={isAmharic ? image.altAm : image.altEn}
-                  className="h-full w-full object-cover object-center"
-                  loading={index === 0 ? 'eager' : 'lazy'}
-                  decoding="async"
-                />
+              <div
+                className="home-hero-slide bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-950"
+                key={image.src}
+              >
+                {!failedHeroImages.includes(image.src) && (
+                  <img
+                    src={image.src}
+                    alt={isAmharic ? image.altAm : image.altEn}
+                    className="h-full w-full object-cover object-center"
+                    loading={index === 0 ? 'eager' : 'lazy'}
+                    decoding="async"
+                    onError={() => setFailedHeroImages((failed) => (
+                      failed.includes(image.src) ? failed : [...failed, image.src]
+                    ))}
+                  />
+                )}
               </div>
             ))}
           </div>
-          <div className="absolute inset-0 bg-black/10" aria-hidden="true" />
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-slate-950/50 via-transparent to-slate-950/20 p-4">
-            <div className="home-hero-welcome">
-              WELCOME TO KEBELE SERVICE PORTAL
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/40 to-slate-950/60" aria-hidden="true" />
+          <div className="absolute inset-0 flex items-center justify-center p-4 sm:p-8">
+            <div className="home-hero-content">
+              <span className="home-hero-kicker">
+                {isAmharic ? 'የኢ-ቀበሌ ዲጂታል አገልግሎት ፖርታል' : 'E-KEBELE DIGITAL SERVICE PORTAL'}
+              </span>
+              <h1 className="home-hero-welcome">{t.heroWelcome}</h1>
+              <p className="home-hero-description">
+                {isAmharic
+                  ? 'የቀበሌ አገልግሎቶችን በዘመናዊ መልኩ በፍጥነት እና በቀላሉ ያግኙ።'
+                  : 'Access your local services online, quickly and easily.'}
+              </p>
             </div>
           </div>
         </section>
-        <details className="home-hero-attribution">
-          <summary>{homeCopy.photoCredits}</summary>
-          <p>
-            <a href="https://commons.wikimedia.org/wiki/File:Ethio_11.jpg" target="_blank" rel="noreferrer">
-              Genet Girma (resized), CC BY-SA 4.0
-            </a>
-            {' · '}
-            <a href="https://commons.wikimedia.org/wiki/File:Information_Network_Security_Agency_Workers.png" target="_blank" rel="noreferrer">
-              INSA, Public Domain
-            </a>
-          </p>
-        </details>
+        <div className="mx-auto w-full max-w-screen-2xl px-4 sm:px-8">
+          <details className="home-hero-attribution">
+            <summary>{homeCopy.photoCredits}</summary>
+            <p>
+              <a href="https://commons.wikimedia.org/wiki/File:Ethio_11.jpg" target="_blank" rel="noreferrer">
+                Genet Girma (resized), CC BY-SA 4.0
+              </a>
+              {' · '}
+              <a href="https://commons.wikimedia.org/wiki/File:Information_Network_Security_Agency_Workers.png" target="_blank" rel="noreferrer">
+                INSA, Public Domain
+              </a>
+            </p>
+          </details>
+        </div>
 
-        <section className="mt-10 grid auto-rows-fr grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+          <section className="grid auto-rows-fr grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {serviceCards.map((service) => (
             <Link
               key={service.path}
@@ -159,9 +242,40 @@ const Home = () => {
               </div>
             </Link>
           ))}
-        </section>
+          </section>
 
-        <section aria-labelledby="home-faq-title" className="mx-auto mt-16 w-full max-w-4xl space-y-6">
+          <section aria-labelledby="home-gallery-title" className="my-12 space-y-6">
+            <header className="mx-auto max-w-3xl space-y-2 text-center">
+              <h2 id="home-gallery-title" className="text-2xl font-bold text-slate-900 sm:text-3xl">
+                {homeCopy.galleryTitle}
+              </h2>
+              <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
+                {homeCopy.gallerySubtitle}
+              </p>
+            </header>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {galleryImages.map((image) => (
+                <article key={image.src} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition duration-200 hover:-translate-y-1 hover:shadow-xl">
+                  <div className="h-48 w-full overflow-hidden">
+                    <img
+                      src={image.src}
+                      alt={isAmharic ? image.altAm : image.altEn}
+                      className="h-full w-full object-cover transition duration-500 hover:scale-105"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <h3 className="text-sm font-bold text-slate-800">
+                      {isAmharic ? image.titleAm : image.titleEn}
+                    </h3>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section aria-labelledby="home-faq-title" className="mx-auto mt-16 w-full max-w-4xl space-y-6">
           <h2 id="home-faq-title" className="text-center text-2xl font-bold text-slate-900">
             {isAmharic ? 'ብዙ ጊዜ የሚጠየቁ ጥያቄዎች' : 'Frequently Asked Questions'}
           </h2>
@@ -187,7 +301,8 @@ const Home = () => {
               </div>
             ))}
           </div>
-        </section>
+          </section>
+        </div>
       </main>
     </div>
   );

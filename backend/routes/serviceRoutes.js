@@ -22,7 +22,10 @@ const assignIssuedNationalId = require('../utils/issuedNationalId');
 const writeAuditLog = require('../utils/writeAuditLog');
 const { getConfiguredServiceFee } = require('../utils/serviceFees');
 const QRCode = require('qrcode');
-const { getDocumentVerificationUrl } = require('../utils/documentVerification');
+const {
+  getDocumentVerificationUrl,
+  isDocumentVerificationEligible,
+} = require('../utils/documentVerification');
 const { getJwtSecret } = require('../utils/securityConfig');
 const { getDuplicateIdentityFilters } = require('../utils/applicationIdentity');
 const validateIdApplicationDocuments = require('../utils/idDocumentValidation');
@@ -541,11 +544,6 @@ router.post('/submit-application', verifyToken, validateUploadContent(upload.fie
   { name: 'webcamPhoto', maxCount: 1 }
 ])), async (req, res) => {
   try {
-    console.log('--- /submit-application incoming request ---');
-    console.log('Service type:', req.body.serviceType);
-    console.log('Request body keys:', Object.keys(req.body));
-    console.log('Files:', Object.keys(req.files || {}));
-
     const svc = (req.body.serviceType || '').toUpperCase();
     let identityVerificationStatus = 'NOT_REQUIRED';
     const submittedEmail = String(req.body.email || '').trim();
@@ -848,7 +846,7 @@ router.post('/submit-application', verifyToken, validateUploadContent(upload.fie
     });
   } catch (error) {
     console.error('Submit application error:', error);
-    res.status(500).json({ success: false, error: 'Network Error ወይም ሲስተም ላይ ችግር ተፈጥሯል' });
+    res.status(500).json({ success: false, message: 'Application submission failed. Please try again later.' });
   }
 });
 
@@ -1047,12 +1045,10 @@ router.get('/verify-document/:applicationId/qr', async (req, res) => {
     const request = await ServiceRequest.findOne({
       applicationId: req.params.applicationId,
       serviceType: { $in: ['NEW_ID_CARD', 'ID_RENEWAL', 'ID_REPLACEMENT'] },
-      $or: [
-        { status: 'COMPLETED' },
-        { status: 'APPROVED_BY_FINANCE', paymentStatus: 'Verified' },
-      ],
-    }).select('applicationId');
-    if (!request) return res.status(404).json({ success: false, message: 'No issued ID matches this verification code.' });
+    }).select('applicationId serviceType status paymentStatus');
+    if (!request || !isDocumentVerificationEligible(request)) {
+      return res.status(404).json({ success: false, message: 'No issued ID matches this verification code.' });
+    }
 
     const qrCode = await QRCode.toBuffer(getDocumentVerificationUrl(request.applicationId), {
       errorCorrectionLevel: 'H',
@@ -1072,17 +1068,9 @@ router.get('/verify-document/:applicationId', async (req, res) => {
   try {
     const request = await ServiceRequest.findOne({
       applicationId: req.params.applicationId,
-      $or: [
-        { status: 'COMPLETED' },
-        {
-          serviceType: 'NEW_ID_CARD',
-          status: 'APPROVED_BY_FINANCE',
-          paymentStatus: 'Verified',
-        },
-      ],
-    }).select('applicationId serviceType status fullName nationalId completedAt paymentVerifiedAt updatedAt');
+    }).select('applicationId serviceType status paymentStatus fullName nationalId completedAt paymentVerifiedAt updatedAt');
 
-    if (!request) {
+    if (!request || !isDocumentVerificationEligible(request)) {
       return res.status(404).json({
         verified: false,
         message: 'No completed document matches this verification code.',

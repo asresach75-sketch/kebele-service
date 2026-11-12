@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useLanguage } from './context/LanguageContext';
@@ -44,8 +44,8 @@ const MarriageRegistration = () => {
     email: 'ኢሜይል አድራሻ', details: 'የጋብቻ ዝርዝር እና ምስክሮች', marriageType: 'የጋብቻ ዓይነት', select: '-- ይምረጡ --', civil: 'ሲቪል', religious: 'ሃይማኖታዊ', customary: 'ባህላዊ',
     marriageDate: 'የጋብቻ ቀን', place: 'የጋብቻ ቦታ / ቀበሌ', proof: 'የጋብቻ ውል ወይም ማረጋገጫ ሰነድ',
     witnessName: (number) => `${number}ኛ ምስክር ሙሉ ስም`, witnessPhone: 'የምስክር ስልክ', witnessId: 'የምስክር መታወቂያ ቁጥር', witnessDocument: (number) => `${number}ኛ ምስክር የመታወቂያ ኮፒ`,
-    fullNamePlaceholder: 'ሙሉ ስም', idPlaceholder: 'መታወቂያ ቁጥር', phonePlaceholder: '09...', placePlaceholder: 'ቀበሌ / ወረዳ',
-    required: 'ይህን መስክ መሙላት ያስፈልጋል።', invalidEmail: 'ትክክለኛ ኢሜይል ያስገቡ።', invalidName: 'ቢያንስ ሁለት ቃላት ያሉት ትክክለኛ ስም ያስገቡ።', invalidPhone: 'በ09 ወይም 07 የሚጀምር ትክክለኛ ስልክ ያስገቡ።', invalidDate: 'ቀኑ ወደፊት መሆን አይችልም።', requiredFile: 'ይህ ሰነድ ያስፈልጋል።', invalidFile: 'ከ5 MB ያነሰ JPG፣ PNG ወይም PDF ፋይል ይጠቀሙ።',
+    fullNamePlaceholder: 'ሙሉ ስም', idPlaceholder: 'መታወቂያ ቁጥር', phonePlaceholder: '09...', placePlaceholder: 'ቀበሌ / ወረዳ', clear: 'ቅጹን አጽዳ', witnessSection: (number) => `${number}ኛ ምስክር መረጃ`,
+    required: 'ይህን መስክ መሙላት ያስፈልጋል።', invalidEmail: 'ትክክለኛ ኢሜይል ያስገቡ።', invalidName: 'ቢያንስ ሁለት ቃላት ያሉት ትክክለኛ ስም ያስገቡ።', invalidPhone: 'በ09 ወይም 07 የሚጀምር ትክክለኛ ስልክ ያስገቡ።', invalidDate: 'ቀኑ ወደፊት መሆን አይችልም።', requiredFile: 'ይህ ሰነድ ያስፈልጋል።', invalidFile: 'ከ5 MB ያነሰ JPG፣ PNG ወይም PDF ፋይል ይጠቀሙ።', selectedFile: 'የተመረጠው ፋይል',
     fixErrors: 'እባክዎ በቀይ የተመለከቱ መስኮችን ያስተካክሉ።', success: 'የጋብቻ ምዝገባ ጥያቄዎ ተልኳል።', backendUnavailable: 'የbackend አገልግሎት አልተገኘም።', failed: 'የጋብቻ ምዝገባ አልተሳካም።', loading: 'በመላክ ላይ...', submit: 'የጋብቻ ምዝገባ ጥያቄ ላክ'
   } : {
     title: 'Marriage Registration', intro: 'Complete the form below to submit your marriage registration request.', back: 'Back to Vital Events',
@@ -55,11 +55,12 @@ const MarriageRegistration = () => {
     email: 'Email Address', details: 'Marriage Details & Witnesses', marriageType: 'Marriage Type', select: '-- Select --', civil: 'Civil', religious: 'Religious', customary: 'Customary',
     marriageDate: 'Marriage Date', place: 'Place of Marriage / Kebele', proof: 'Marriage Agreement or Certificate Proof',
     witnessName: (number) => `${number}${number === 1 ? 'st' : number === 2 ? 'nd' : 'rd'} Witness Full Name`, witnessPhone: 'Witness Phone', witnessId: 'Witness ID Number', witnessDocument: (number) => `${number}${number === 1 ? 'st' : number === 2 ? 'nd' : 'rd'} Witness ID Copy`,
-    fullNamePlaceholder: 'Full name', idPlaceholder: 'ID number', phonePlaceholder: '09...', placePlaceholder: 'Kebele / Woreda',
-    required: 'This field is required.', invalidEmail: 'Enter a valid email address.', invalidName: 'Enter a valid name with at least two words.', invalidPhone: 'Use a valid Ethiopian number starting with 09 or 07.', invalidDate: 'Date cannot be in the future.', requiredFile: 'This document is required.', invalidFile: 'Use a JPG, PNG, or PDF file smaller than 5 MB.',
+    fullNamePlaceholder: 'Full name', idPlaceholder: 'ID number', phonePlaceholder: '09...', placePlaceholder: 'Kebele / Woreda', clear: 'Clear Form', witnessSection: (number) => `${number}${number === 1 ? 'st' : number === 2 ? 'nd' : 'rd'} Witness Information`,
+    required: 'This field is required.', invalidEmail: 'Enter a valid email address.', invalidName: 'Enter a valid name with at least two words.', invalidPhone: 'Use a valid Ethiopian number starting with 09 or 07.', invalidDate: 'Date cannot be in the future.', requiredFile: 'This document is required.', invalidFile: 'Use a JPG, PNG, or PDF file smaller than 5 MB.', selectedFile: 'Selected file',
     fixErrors: 'Please correct the highlighted or invalid fields before submitting.', success: 'Marriage registration submitted successfully.', backendUnavailable: 'Backend server is unavailable. Please start the backend on port 5000.', failed: 'Marriage registration failed.', loading: 'Submitting marriage request...', submit: 'Submit Marriage Request'
   };
   const navigate = useNavigate();
+  const formRef = useRef(null);
   const [formData, setFormData] = useState(initialFormData);
   const [files, setFiles] = useState({ husbandPhoto: null, wifePhoto: null, marriageCertPhoto: null, witness1IdDocument: null, witness2IdDocument: null, witness3IdDocument: null });
   const [loading, setLoading] = useState(false);
@@ -77,8 +78,22 @@ const MarriageRegistration = () => {
     setErrors((current) => ({ ...current, [event.target.name]: '' }));
   };
 
+  const clearForm = () => {
+    formRef.current?.reset();
+    setFormData(initialFormData);
+    setFiles({ husbandPhoto: null, wifePhoto: null, marriageCertPhoto: null, witness1IdDocument: null, witness2IdDocument: null, witness3IdDocument: null });
+    setErrors({});
+    setMessage('');
+    setSubmissionSucceeded(false);
+  };
+
   const inputClass = (field) => `${fieldClass} ${errors[field] ? 'border-red-500 bg-red-50 focus:border-red-500 focus:ring-red-100' : ''}`;
   const renderError = (field) => errors[field] && <p className="mt-1 text-xs font-semibold text-red-600">{errors[field]}</p>;
+  const renderSelectedFile = (field) => files[field] && (
+    <p className="mt-1 min-w-0 break-all text-xs text-gray-600" title={files[field].name} aria-live="polite">
+      <span className="font-semibold">{copy.selectedFile}:</span> {files[field].name}
+    </p>
+  );
 
   const validate = () => {
     const nextErrors = {};
@@ -146,12 +161,15 @@ const MarriageRegistration = () => {
   };
 
   const renderWitness = (number) => (
-    <div className="grid grid-cols-1 gap-3 border-t border-gray-200 pt-4 md:grid-cols-2 xl:grid-cols-4">
-      <label><span className={labelClass}>{copy.witnessName(number)} *</span><input className={inputClass(`witness${number}Name`)} name={`witness${number}Name`} value={formData[`witness${number}Name`]} onChange={handleChange} placeholder={copy.fullNamePlaceholder} />{renderError(`witness${number}Name`)}</label>
-      <label><span className={labelClass}>{copy.witnessPhone} *</span><input className={inputClass(`witness${number}Phone`)} type="tel" name={`witness${number}Phone`} value={formData[`witness${number}Phone`]} onChange={handleChange} placeholder={copy.phonePlaceholder} />{renderError(`witness${number}Phone`)}</label>
-      <label><span className={labelClass}>{copy.witnessId} *</span><input className={inputClass(`witness${number}Id`)} name={`witness${number}Id`} value={formData[`witness${number}Id`]} onChange={handleChange} placeholder={copy.idPlaceholder} />{renderError(`witness${number}Id`)}</label>
-      <label><span className={labelClass}>{copy.witnessDocument(number)} *</span><input className={inputClass(`witness${number}IdDocument`)} type="file" name={`witness${number}IdDocument`} accept="image/jpeg,image/png,application/pdf" onChange={handleFileChange} />{renderError(`witness${number}IdDocument`)}</label>
-    </div>
+    <fieldset key={number} className="min-w-0 rounded-lg border border-gray-200 bg-white p-3">
+      <legend className="px-2 text-sm font-bold text-slate-800">{copy.witnessSection(number)}</legend>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <label className="min-w-0"><span className={labelClass}>{copy.witnessName(number)} *</span><input className={`min-w-0 ${inputClass(`witness${number}Name`)}`} name={`witness${number}Name`} value={formData[`witness${number}Name`]} onChange={handleChange} placeholder={copy.fullNamePlaceholder} />{renderError(`witness${number}Name`)}</label>
+      <label className="min-w-0"><span className={labelClass}>{copy.witnessPhone} *</span><input className={`min-w-0 ${inputClass(`witness${number}Phone`)}`} type="tel" name={`witness${number}Phone`} value={formData[`witness${number}Phone`]} onChange={handleChange} placeholder={copy.phonePlaceholder} />{renderError(`witness${number}Phone`)}</label>
+      <label className="min-w-0"><span className={labelClass}>{copy.witnessId} *</span><input className={`min-w-0 ${inputClass(`witness${number}Id`)}`} name={`witness${number}Id`} value={formData[`witness${number}Id`]} onChange={handleChange} placeholder={copy.idPlaceholder} />{renderError(`witness${number}Id`)}</label>
+      <label className="min-w-0"><span className={labelClass}>{copy.witnessDocument(number)} *</span><input className={`min-w-0 ${inputClass(`witness${number}IdDocument`)}`} type="file" name={`witness${number}IdDocument`} accept="image/jpeg,image/png,application/pdf" onChange={handleFileChange} />{renderSelectedFile(`witness${number}IdDocument`)}{renderError(`witness${number}IdDocument`)}</label>
+      </div>
+    </fieldset>
   );
 
   return (
@@ -165,27 +183,31 @@ const MarriageRegistration = () => {
           <button type="button" onClick={() => navigate('/vital-events')} className="rounded-lg bg-gray-700 px-4 py-2 text-xs font-bold text-white transition hover:bg-gray-800">{copy.back}</button>
         </div>
         {message && <div className={`mb-6 rounded-lg p-3 text-center text-sm font-bold ${submissionSucceeded ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{message}</div>}
-        <form onSubmit={handleSubmit} noValidate className="space-y-6">
+        <form ref={formRef} onSubmit={handleSubmit} noValidate className="space-y-6">
           <section className="rounded-xl border border-blue-100 bg-blue-50/50 p-4">
             <h2 className="mb-4 font-bold text-blue-900">{copy.husbandSection}</h2>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <label><span className={labelClass}>{copy.husbandName} *</span><input className={inputClass('husbandName')} name="husbandName" value={formData.husbandName} onChange={handleChange} />{renderError('husbandName')}</label>
               <label><span className={labelClass}>{copy.husbandId} *</span><input className={inputClass('husbandId')} name="husbandId" value={formData.husbandId} onChange={handleChange} placeholder={copy.idPlaceholder} />{renderError('husbandId')}</label>
+            </div>
+            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
               <label><span className={labelClass}>{copy.husbandDob} *</span><input className={inputClass('husbandDob')} type="date" name="husbandDob" max={new Date().toISOString().split('T')[0]} value={formData.husbandDob} onChange={handleChange} />{renderError('husbandDob')}</label>
               <label><span className={labelClass}>{copy.husbandPhone} *</span><input className={inputClass('husbandPhone')} type="tel" name="husbandPhone" value={formData.husbandPhone} onChange={handleChange} placeholder={copy.phonePlaceholder} />{renderError('husbandPhone')}</label>
               <label><span className={labelClass}>{copy.email} *</span><input className={inputClass('email')} type="email" name="email" value={formData.email} onChange={handleChange} placeholder="example@gmail.com" />{renderError('email')}</label>
-              <label className="md:col-span-2"><span className={labelClass}>{copy.husbandPhoto} *</span><input className={`w-full rounded-lg border bg-white p-2 text-xs ${errors.husbandPhoto ? 'border-red-500 bg-red-50' : 'border-gray-300'}`} type="file" name="husbandPhoto" accept="image/jpeg,image/png" onChange={handleFileChange} />{renderError('husbandPhoto')}</label>
             </div>
+            <label className="mt-4 block min-w-0"><span className={labelClass}>{copy.husbandPhoto} *</span><input className={`min-w-0 w-full rounded-lg border bg-white p-2 text-xs ${errors.husbandPhoto ? 'border-red-500 bg-red-50' : 'border-gray-300'}`} type="file" name="husbandPhoto" accept="image/jpeg,image/png" onChange={handleFileChange} />{renderSelectedFile('husbandPhoto')}{renderError('husbandPhoto')}</label>
           </section>
           <section className="rounded-xl border border-pink-100 bg-pink-50/40 p-4">
             <h2 className="mb-4 font-bold text-blue-900">{copy.wifeSection}</h2>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <label><span className={labelClass}>{copy.wifeName} *</span><input className={inputClass('wifeName')} name="wifeName" value={formData.wifeName} onChange={handleChange} />{renderError('wifeName')}</label>
               <label><span className={labelClass}>{copy.wifeId} *</span><input className={inputClass('wifeId')} name="wifeId" value={formData.wifeId} onChange={handleChange} placeholder={copy.idPlaceholder} />{renderError('wifeId')}</label>
+            </div>
+            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
               <label><span className={labelClass}>{copy.wifeDob} *</span><input className={inputClass('wifeDob')} type="date" name="wifeDob" max={new Date().toISOString().split('T')[0]} value={formData.wifeDob} onChange={handleChange} />{renderError('wifeDob')}</label>
               <label><span className={labelClass}>{copy.wifePhone} *</span><input className={inputClass('wifePhone')} type="tel" name="wifePhone" value={formData.wifePhone} onChange={handleChange} placeholder={copy.phonePlaceholder} />{renderError('wifePhone')}</label>
-              <label className="md:col-span-2"><span className={labelClass}>{copy.wifePhoto} *</span><input className={`w-full rounded-lg border bg-white p-2 text-xs ${errors.wifePhoto ? 'border-red-500 bg-red-50' : 'border-gray-300'}`} type="file" name="wifePhoto" accept="image/jpeg,image/png" onChange={handleFileChange} />{renderError('wifePhoto')}</label>
             </div>
+            <label className="mt-4 block min-w-0"><span className={labelClass}>{copy.wifePhoto} *</span><input className={`min-w-0 w-full rounded-lg border bg-white p-2 text-xs ${errors.wifePhoto ? 'border-red-500 bg-red-50' : 'border-gray-300'}`} type="file" name="wifePhoto" accept="image/jpeg,image/png" onChange={handleFileChange} />{renderSelectedFile('wifePhoto')}{renderError('wifePhoto')}</label>
           </section>
           <section className="space-y-4 rounded-xl border border-gray-200 bg-gray-50 p-4">
             <h2 className="font-bold text-blue-900">{copy.details}</h2>
@@ -194,10 +216,15 @@ const MarriageRegistration = () => {
               <label><span className={labelClass}>{copy.marriageDate} *</span><input className={inputClass('marriageDate')} type="date" name="marriageDate" max={new Date().toISOString().split('T')[0]} value={formData.marriageDate} onChange={handleChange} />{renderError('marriageDate')}</label>
               <label><span className={labelClass}>{copy.place} *</span><input className={inputClass('placeOfMarriage')} name="placeOfMarriage" value={formData.placeOfMarriage} onChange={handleChange} placeholder={copy.placePlaceholder} />{renderError('placeOfMarriage')}</label>
             </div>
-            <label className="block"><span className={labelClass}>{copy.proof} *</span><input className={inputClass('marriageCertPhoto')} type="file" name="marriageCertPhoto" accept="image/jpeg,image/png,application/pdf" onChange={handleFileChange} />{renderError('marriageCertPhoto')}</label>
-            {renderWitness(1)}{renderWitness(2)}{renderWitness(3)}
+            <label className="block min-w-0"><span className={labelClass}>{copy.proof} *</span><input className={`min-w-0 ${inputClass('marriageCertPhoto')}`} type="file" name="marriageCertPhoto" accept="image/jpeg,image/png,application/pdf" onChange={handleFileChange} />{renderSelectedFile('marriageCertPhoto')}{renderError('marriageCertPhoto')}</label>
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              {renderWitness(1)}{renderWitness(2)}{renderWitness(3)}
+            </div>
           </section>
-          <button type="submit" disabled={loading} className="w-full rounded-lg bg-blue-700 py-3 text-sm font-bold text-white shadow transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60">{loading ? copy.loading : copy.submit}</button>
+          <div className="flex flex-col-reverse justify-end gap-3 sm:flex-row">
+            <button type="button" onClick={clearForm} disabled={loading} className="rounded-lg border border-gray-300 bg-gray-100 px-5 py-3 text-sm font-bold text-gray-700 transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-60">{copy.clear}</button>
+            <button type="submit" disabled={loading} className="rounded-lg bg-blue-700 px-5 py-3 text-sm font-bold text-white shadow transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60">{loading ? copy.loading : copy.submit}</button>
+          </div>
         </form>
       </div>
     </div>

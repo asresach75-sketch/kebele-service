@@ -34,6 +34,7 @@ const adminAmharic = {
   'E-KEBELE ADMIN': 'ኢ-ቀበሌ አስተዳዳሪ',
   'Management Portal': 'የአስተዳደር ፖርታል',
   WORKSPACE: 'የስራ ቦታ',
+  Dashboard: 'ዳሽቦርድ',
   'User & Staff Accounts': 'የተጠቃሚና የሰራተኛ መለያዎች',
   'Application Management': 'የማመልከቻ አስተዳደር',
   'Add Staff': 'ሰራተኛ ጨምር',
@@ -43,6 +44,7 @@ const adminAmharic = {
   'OPERATIONS OVERVIEW': 'የስራዎች አጠቃላይ እይታ',
   'E-KEBELE ADMIN DASHBOARD': 'የኢ-ቀበሌ አስተዳደር ዳሽቦርድ',
   'Manage accounts, applications, and service delivery.': 'መለያዎችን፣ ማመልከቻዎችን እና የአገልግሎት አሰጣጥን ያስተዳድሩ።',
+  'Manage users, staff, and account access.': 'ተጠቃሚዎችን፣ ሰራተኞችን እና የመለያ መዳረሻን ያስተዳድሩ።',
   Database: 'ዳታቤዝ',
   'Checking…': 'በመፈተሽ ላይ…',
   Connected: 'ተገናኝቷል',
@@ -173,7 +175,11 @@ export default function AdminDashboard() {
   const isAmharic = lang === 'am';
   const text = (english) => (isAmharic ? adminAmharic[english] || english : english);
   const location = useLocation();
-  const routeTab = location.pathname === '/admin-applications' ? 'applications' : 'users';
+  const routeTab = location.pathname === '/admin-applications'
+    ? 'applications'
+    : location.pathname === '/admin-users'
+      ? 'users'
+      : 'dashboard';
   const statusText = (status) => {
     if (!status) return '—';
     const normalizedStatus = String(status).replaceAll('_', ' ');
@@ -408,7 +414,8 @@ export default function AdminDashboard() {
               <div><strong>{text('E-KEBELE ADMIN')}</strong><small>{text('Management Portal')}</small></div>
             </div>
             <p className="admin-sidebar-label">{text('WORKSPACE')}</p>
-            <Link to="/admin-dashboard" className={`admin-sidebar-link${activeTab === 'users' ? ' active' : ''}`} aria-current={activeTab === 'users' ? 'page' : undefined}><span className="admin-sidebar-icon" aria-hidden="true">👥</span><span>{text('User & Staff Accounts')}</span></Link>
+            <Link to="/admin-dashboard" className={`admin-sidebar-link${activeTab === 'dashboard' ? ' active' : ''}`} aria-current={activeTab === 'dashboard' ? 'page' : undefined}><span className="admin-sidebar-icon" aria-hidden="true">⌂</span><span>{text('Dashboard')}</span></Link>
+            <Link to="/admin-users" className={`admin-sidebar-link${activeTab === 'users' ? ' active' : ''}`} aria-current={activeTab === 'users' ? 'page' : undefined}><span className="admin-sidebar-icon" aria-hidden="true">👥</span><span>{text('User & Staff Accounts')}</span></Link>
             <Link to="/admin-applications" className={`admin-sidebar-link${activeTab === 'applications' ? ' active' : ''}`} aria-current={activeTab === 'applications' ? 'page' : undefined}><span className="admin-sidebar-icon" aria-hidden="true">📝</span><span>{text('Application Management')}</span></Link>
             <Link to="/add-staff" className="admin-sidebar-link"><span className="admin-sidebar-icon" aria-hidden="true">♟</span><span>{text('Add Staff')}</span></Link>
             <Link to="/manage-fees" className="admin-sidebar-link"><span className="admin-sidebar-icon" aria-hidden="true">▣</span><span>{text('Service Fees')}</span></Link>
@@ -420,8 +427,8 @@ export default function AdminDashboard() {
         <div className="admin-welcome">
           <div className="admin-welcome-copy">
             <p className="admin-eyebrow">{text('OPERATIONS OVERVIEW')}</p>
-            <h1>🏛️ {text('E-KEBELE ADMIN DASHBOARD')}</h1>
-            <p>{text('Manage accounts, applications, and service delivery.')}</p>
+            <h1>🏛️ {text(activeTab === 'users' ? 'User & Staff Accounts' : 'E-KEBELE ADMIN DASHBOARD')}</h1>
+            <p>{text(activeTab === 'users' ? 'Manage users, staff, and account access.' : 'Manage accounts, applications, and service delivery.')}</p>
           </div>
           <div className="admin-header-actions">
             <div className={`admin-database-status ${databaseConnected === null ? 'checking' : databaseConnected ? 'connected' : 'disconnected'}`} role="status" aria-live="polite">
@@ -501,7 +508,8 @@ export default function AdminDashboard() {
           </form>
         )}
 
-        {['users', 'add-staff', 'applications'].includes(activeTab) && <>
+        {['dashboard', 'applications', 'users'].includes(activeTab) && <>
+          {['dashboard', 'applications'].includes(activeTab) && <>
           <section className="admin-stats">
             <div className="stat-users"><span>{text('Total Users')}</span><strong>{users.length}</strong></div>
             <div className="stat-approved"><span>{text('Approved Documents')}</span><strong>{requests.filter((item) => completeStatuses.includes(item.status)).length}</strong></div>
@@ -517,7 +525,8 @@ export default function AdminDashboard() {
             </div>
             <div className="admin-table"><table><thead><tr><th>{text('Application ID')}</th><th>{text('Applicant')}</th><th>{text('Service')}</th><th>{text('Status')}</th><th>{text('Action')}</th></tr></thead><tbody>{deliveryItems.length ? deliveryItems.map((request) => <tr key={request._id}><td>{request.applicationId}</td><td>{request.fullName || request.husbandName || request.wifeName || text('Applicant')}</td><td>{text(request.serviceType)}</td><td><span className={`admin-status ${request.status === 'COMPLETED' ? 'active' : ''}`}>{statusText(request.status)}</span></td><td>{request.status === 'APPROVED_BY_FINANCE' ? <button type="button" className="user-review-button" onClick={() => completeApplication(request)} disabled={completingRequestIds.has(request._id)}>{text(completingRequestIds.has(request._id) ? 'Marking completed...' : 'Mark Completed')}</button> : text('Ready for collection')}</td></tr>) : <tr><td colSpan="5" className="admin-empty">{text('No delivery records match these filters.')}</td></tr>}</tbody></table></div>
           </section>
-          {['users', 'add-staff'].includes(activeTab) && <section className="admin-queue">
+          </>}
+          {activeTab === 'users' && <section className="admin-queue">
             <div className="queue-heading"><h2>{text('User and Staff Accounts')}</h2><span>{users.length} {text('total')}</span></div>
             <div className="admin-list-filters account-filters">
               <label>{text('Search accounts')}<input type="search" value={accountQuery} onChange={(event) => setAccountQuery(event.target.value)} placeholder={text('Name, email, phone, or role')} /></label>

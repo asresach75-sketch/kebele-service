@@ -27,7 +27,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
   const nameParts = fullName.split(/\s+/).filter(Boolean);
   const profileLabel = nameParts.length > 1 ? `${nameParts[0]} ${nameParts[nameParts.length - 1][0]}.` : fullName;
   const navLinks = location.pathname === '/signup'
-    ? [{ name: lang === 'am' ? '← ወደ መነሻ ገጽ' : '← Back to Home', path: '/' }]
+    ? [{ name: `← ${t.backHome}`, path: '/' }]
     : location.pathname === '/forgot-password'
       ? []
     : [
@@ -96,7 +96,10 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
           </Link>
 
           {navLinks.length > 0 && (
-            <nav aria-label={lang === 'am' ? 'Үндсэн цэс' : 'Main navigation'} className="navbar-primary-nav">
+            <nav
+              aria-label={lang === 'am' ? 'ዋና ምናሌ' : 'Main navigation'}
+              className={`navbar-primary-nav${location.pathname === '/signup' ? ' navbar-primary-nav-signup' : ''}`}
+            >
               {navLinks.map((link) => {
                 const isActive = location.pathname === link.path
                   || (link.path === '/' && location.pathname === '/home');
@@ -190,6 +193,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
 
         </div>
       </div>
+      <div className="navbar-flag-stripe" aria-hidden="true" />
     </header>
   );
 };

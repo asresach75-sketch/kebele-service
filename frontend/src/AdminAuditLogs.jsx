@@ -11,6 +11,7 @@ const amharicText = {
   'E-KEBELE ADMIN': 'ኢ-ቀበሌ አስተዳዳሪ',
   'Management Portal': 'የአስተዳደር ፖርታል',
   WORKSPACE: 'የስራ ቦታ',
+  Dashboard: 'ዳሽቦርድ',
   'User & Staff Accounts': 'የተጠቃሚና የሰራተኛ መለያዎች',
   'Application Management': 'የማመልከቻ አስተዳደር',
   'Add Staff': 'ሰራተኛ ጨምር',
@@ -111,7 +112,8 @@ export default function AdminAuditLogs() {
               <div><strong>{text('E-KEBELE ADMIN')}</strong><small>{text('Management Portal')}</small></div>
             </div>
             <p className="admin-sidebar-label">{text('WORKSPACE')}</p>
-            <Link to="/admin-dashboard" className="admin-sidebar-link"><span className="admin-sidebar-icon" aria-hidden="true">👥</span><span>{text('User & Staff Accounts')}</span></Link>
+            <Link to="/admin-dashboard" className="admin-sidebar-link"><span className="admin-sidebar-icon" aria-hidden="true">⌂</span><span>{text('Dashboard')}</span></Link>
+            <Link to="/admin-users" className="admin-sidebar-link"><span className="admin-sidebar-icon" aria-hidden="true">👥</span><span>{text('User & Staff Accounts')}</span></Link>
             <Link to="/admin-applications" className="admin-sidebar-link"><span className="admin-sidebar-icon" aria-hidden="true">📝</span><span>{text('Application Management')}</span></Link>
             <Link to="/add-staff" className="admin-sidebar-link"><span className="admin-sidebar-icon" aria-hidden="true">♟</span><span>{text('Add Staff')}</span></Link>
             <Link to="/manage-fees" className="admin-sidebar-link"><span className="admin-sidebar-icon" aria-hidden="true">▣</span><span>{text('Service Fees')}</span></Link>

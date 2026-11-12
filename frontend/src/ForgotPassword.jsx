@@ -35,9 +35,15 @@ const ForgotPassword = () => {
       }
       setSubmitted(true);
     } catch (requestError) {
-      setError(requestError.message || (lang === 'am'
-        ? 'ከሰርቨሩ ጋር መገናኘት አልተቻለም። እባክዎ ቆይተው እንደገና ይሞክሩ።'
-        : 'Could not connect to the server. Please try again later.'));
+      const isNetworkError = requestError instanceof TypeError
+        || requestError.message === 'Failed to fetch';
+      setError(isNetworkError
+        ? (lang === 'am'
+          ? 'ሰርቨሩን ማግኘት አልተቻለም። Backend ሰርቨሩና ዳታቤዙ መስራታቸውን ያረጋግጡ እና እንደገና ይሞክሩ።'
+          : 'Could not reach the server. Check that the backend and database are running, then try again.')
+        : requestError.message || (lang === 'am'
+          ? 'የይለፍ ቃል ማደሻ ጥያቄውን ማስኬድ አልተቻለም። እባክዎ እንደገና ይሞክሩ።'
+          : 'Could not process the password reset request. Please try again.'));
     } finally {
       setSubmitting(false);
     }
@@ -102,12 +108,10 @@ const ForgotPassword = () => {
           </button>
         </form>
 
-        <div className="mt-5 text-center text-xs text-slate-500">
+        <div className="mt-5 flex flex-col items-center gap-4 text-center text-xs text-slate-500">
           <Link to="/login" className="font-semibold text-blue-600 hover:underline">
             {lang === 'am' ? '← ወደ መግቢያ ገጽ ተመለስ' : '← Back to login'}
           </Link>
-        </div>
-        <div className="mt-4 flex justify-start">
           <Link to="/" className="flex items-center space-x-1 text-sm font-medium text-blue-600 hover:underline">
             <span aria-hidden="true">←</span>
             <span>{lang === 'am' ? 'ወደ መነሻ ገጽ' : 'Back to Home'}</span>

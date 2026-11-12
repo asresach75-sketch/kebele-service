@@ -40,3 +40,27 @@ test('ServiceRequest includes structured identity fields for residency verificat
     assert.ok(ServiceRequest.schema.path(path), `Missing schema field: ${path}`);
   }
 });
+
+test('ServiceRequest treats a blank optional renewal reason as omitted', async () => {
+  const request = new ServiceRequest({
+    applicationId: 'EKB-TEST-100001',
+    serviceType: 'NEW_ID_CARD',
+    renewalReason: ''
+  });
+
+  assert.equal(request.renewalReason, undefined);
+  await assert.doesNotReject(request.validate());
+});
+
+test('ServiceRequest still rejects unsupported non-empty renewal reasons', async () => {
+  const request = new ServiceRequest({
+    applicationId: 'EKB-TEST-100002',
+    serviceType: 'ID_RENEWAL',
+    renewalReason: 'OTHER'
+  });
+
+  await assert.rejects(request.validate(), (error) => {
+    assert.ok(error.errors.renewalReason);
+    return true;
+  });
+});

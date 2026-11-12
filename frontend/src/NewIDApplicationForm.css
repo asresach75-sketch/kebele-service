@@ -38,7 +38,7 @@
   margin-bottom: 18px;
 }
 
-.new-id-form fieldset:nth-of-type(4),
+.new-id-administrative-details,
 .new-id-form fieldset > .new-id-camera {
   display: none;
 }
@@ -56,10 +56,21 @@
 
 .new-id-heading-top {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 18px;
   text-align: left;
+}
+
+.new-id-heading-top > div {
+  min-width: 0;
+  flex: 1 1 280px;
+}
+
+.new-id-heading-top > div > p:not(.new-id-eyebrow) {
+  line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .new-id-language-toggle {
@@ -178,14 +189,146 @@
   max-width: 1200px;
   margin: 28px auto;
   padding: 32px;
+  scroll-margin-top: 5rem;
   background: white;
   border-top: 5px solid #0d3f8a;
   border-radius: 8px;
   box-shadow: 0 15px 40px #1e3a5f14;
 }
 
+.new-id-stepper {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 24px;
+  padding: 0;
+  list-style: none;
+}
+
+.new-id-stepper-step {
+  display: flex;
+  min-width: 0;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-align: left;
+}
+
+.new-id-stepper-number {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 2px solid #cbd5e1;
+  border-radius: 50%;
+  background: #fff;
+  color: #64748b;
+  font-size: 0.82rem;
+}
+
+.new-id-stepper-step.is-current {
+  color: #1d4ed8;
+}
+
+.new-id-stepper-step.is-current .new-id-stepper-number {
+  border-color: #2563eb;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.new-id-stepper-step.is-complete {
+  color: #15803d;
+}
+
+.new-id-stepper-step.is-complete .new-id-stepper-number {
+  border-color: #16a34a;
+  background: #f0fdf4;
+  color: #15803d;
+}
+
 .new-id-renewal-card {
-  max-width: 900px;
+  max-width: 1100px;
+}
+
+.new-id-renewal-fieldset > .new-id-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: start;
+}
+
+.new-id-renewal-fieldset > .new-id-grid > .new-id-renewal-id-number {
+  grid-column: 4;
+  align-self: start;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.new-id-renewal-fieldset .new-id-select-renewalReason:focus-within {
+  position: relative;
+  z-index: 1;
+}
+
+.new-id-renewal-fieldset > .new-id-grid > .new-id-renewal-id-number p {
+  font-size: 0.7rem;
+}
+
+.new-id-renewal-fieldset > .new-id-grid > .new-id-field-wrap-firstName {
+  grid-column: 1;
+}
+
+.new-id-renewal-fieldset > .new-id-grid > .new-id-field-wrap-middleName {
+  grid-column: 2;
+}
+
+.new-id-renewal-fieldset > .new-id-grid > .new-id-field-wrap-lastName {
+  grid-column: 3;
+}
+
+.new-id-renewal-fieldset > .new-id-grid > .new-id-select-renewalReason {
+  grid-column: 1 / span 2;
+}
+
+.new-id-renewal-fieldset:not(.is-expired) > .new-id-grid > .new-id-select-renewalReason {
+  grid-column: 1 / -1;
+}
+
+.new-id-renewal-fieldset.is-expired > .new-id-grid > .new-id-field-wrap-idExpiryDate {
+  grid-column: 3 / span 2;
+}
+
+.new-id-renewal-fieldset > .new-id-grid > .new-id-hint {
+  grid-column: 1 / -1;
+  margin: 0;
+  align-self: center;
+  line-height: 1.45;
+}
+
+.new-id-renewal-fieldset > .new-id-grid > .new-id-select-gender {
+  grid-column: 1;
+}
+
+.new-id-renewal-fieldset > .new-id-grid > .new-id-field-wrap-dateOfBirth {
+  grid-column: 2;
+}
+
+.new-id-renewal-fieldset > .new-id-grid > .new-id-field-wrap-age {
+  grid-column: 3;
+}
+
+.new-id-renewal-fieldset > .new-id-grid > .new-id-field-wrap-ageCategory {
+  grid-column: 4;
+}
+
+.new-id-renewal-fieldset > .new-id-grid > .new-id-field-wrap-phoneNumber,
+.new-id-renewal-fieldset > .new-id-grid > .new-id-field-wrap-email {
+  grid-column: span 2;
+}
+
+.new-id-renewal-fieldset > .new-id-grid > .new-id-age-warning {
+  grid-column: 1 / -1;
 }
 
 .new-id-heading {
@@ -373,6 +516,70 @@
   border-radius: 6px;
 }
 
+.new-id-renewal-photo-upload {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(0, 1fr) minmax(120px, 220px);
+  align-items: stretch;
+  gap: 14px;
+}
+
+.new-id-renewal-photo-controls {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-content: start;
+  align-items: start;
+  gap: 12px;
+}
+
+.new-id-renewal-photo-controls > .new-id-upload,
+.new-id-renewal-photo-controls > .new-id-file-preview {
+  grid-column: 1;
+}
+
+.new-id-renewal-photo-controls > .new-id-camera {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.new-id-renewal-photo-controls .new-id-camera-actions {
+  margin: 0;
+}
+
+.new-id-renewal-photo-controls .new-id-camera-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+}
+
+.new-id-renewal-photo-upload .new-id-photo-preview,
+.new-id-renewal-photo-placeholder {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 220px;
+  height: 190px;
+  max-height: 240px;
+  margin: 0;
+  object-fit: contain;
+  border: 1px dashed #cbd6e4;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.new-id-renewal-photo-placeholder {
+  display: grid;
+  place-items: center;
+  padding: 12px;
+  color: #64748b;
+  font-size: 0.75rem;
+  text-align: center;
+}
+
 .new-id-camera-actions {
   display: flex;
   flex-wrap: wrap;
@@ -448,6 +655,28 @@
   background: #fff7f7;
 }
 
+.new-id-renewal-card .clear-button {
+  background: #f1f5f9;
+}
+
+.new-id-renewal-card .clear-button:hover {
+  border-color: #94a3b8;
+  color: #334155;
+  background: #e2e8f0;
+}
+
+.new-id-previous-button {
+  border: 1px solid #bfdbfe;
+  color: #1d4ed8;
+  background: #fff;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.new-id-previous-button:hover {
+  border-color: #60a5fa;
+  background: #eff6ff;
+}
+
 .submit-button {
   color: white;
   background: #2563eb;
@@ -500,12 +729,47 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .new-id-renewal-fieldset > .new-id-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .new-id-renewal-fieldset > .new-id-grid > .new-id-renewal-id-number,
+  .new-id-renewal-fieldset > .new-id-grid > .new-id-hint {
+    grid-column: 1 / -1;
+  }
+
+  .new-id-renewal-fieldset > .new-id-grid > .new-id-field-wrap-firstName,
+  .new-id-renewal-fieldset > .new-id-grid > .new-id-field-wrap-middleName,
+  .new-id-renewal-fieldset > .new-id-grid > .new-id-field-wrap-lastName,
+  .new-id-renewal-fieldset > .new-id-grid > .new-id-select-renewalReason,
+  .new-id-renewal-fieldset.is-expired > .new-id-grid > .new-id-field-wrap-idExpiryDate,
+  .new-id-renewal-fieldset > .new-id-grid > .new-id-select-gender,
+  .new-id-renewal-fieldset > .new-id-grid > .new-id-field-wrap-dateOfBirth,
+  .new-id-renewal-fieldset > .new-id-grid > .new-id-field-wrap-age,
+  .new-id-renewal-fieldset > .new-id-grid > .new-id-field-wrap-ageCategory,
+  .new-id-renewal-fieldset > .new-id-grid > .new-id-field-wrap-phoneNumber,
+  .new-id-renewal-fieldset > .new-id-grid > .new-id-field-wrap-email {
+    grid-column: span 1;
+  }
+
+  .new-id-renewal-photo-upload {
+    grid-template-columns: minmax(0, 1fr) minmax(100px, 180px);
+  }
+
   .new-id-actions {
     flex-direction: column-reverse;
   }
 
   .new-id-actions button {
     width: 100%;
+  }
+
+  .new-id-renewal-card .new-id-actions {
+    flex-direction: row;
+  }
+
+  .new-id-renewal-card .new-id-actions button {
+    width: auto;
   }
 }
 
@@ -514,8 +778,66 @@
     grid-template-columns: 1fr;
   }
 
+  .new-id-renewal-fieldset > .new-id-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .new-id-renewal-fieldset > .new-id-grid > .new-id-field-wrap-firstName,
+  .new-id-renewal-fieldset > .new-id-grid > .new-id-field-wrap-middleName,
+  .new-id-renewal-fieldset > .new-id-grid > .new-id-field-wrap-lastName,
+  .new-id-renewal-fieldset > .new-id-grid > .new-id-select-renewalReason,
+  .new-id-renewal-fieldset.is-expired > .new-id-grid > .new-id-field-wrap-idExpiryDate,
+  .new-id-renewal-fieldset > .new-id-grid > .new-id-select-gender,
+  .new-id-renewal-fieldset > .new-id-grid > .new-id-field-wrap-dateOfBirth,
+  .new-id-renewal-fieldset > .new-id-grid > .new-id-field-wrap-age,
+  .new-id-renewal-fieldset > .new-id-grid > .new-id-field-wrap-ageCategory,
+  .new-id-renewal-fieldset > .new-id-grid > .new-id-field-wrap-phoneNumber,
+  .new-id-renewal-fieldset > .new-id-grid > .new-id-field-wrap-email {
+    grid-column: auto;
+  }
+
+  .new-id-renewal-photo-upload {
+    grid-template-columns: 1fr;
+  }
+
+  .new-id-renewal-photo-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .new-id-renewal-photo-controls > .new-id-camera {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .new-id-renewal-photo-upload .new-id-photo-preview,
+  .new-id-renewal-photo-placeholder {
+    width: min(100%, 220px);
+    justify-self: center;
+  }
+
+  .new-id-stepper {
+    gap: 6px;
+  }
+
+  .new-id-stepper-step {
+    font-size: 0.65rem;
+    gap: 6px;
+  }
+
+  .new-id-stepper-number {
+    width: 28px;
+    height: 28px;
+  }
+
   .new-id-heading-top {
     align-items: flex-start;
-    flex-direction: column-reverse;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 700px) {
+  .new-id-heading-top {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

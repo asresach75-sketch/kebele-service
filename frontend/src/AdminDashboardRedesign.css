@@ -292,18 +292,27 @@
   gap: 12px;
   padding: 16px 18px;
   border-bottom: 1px solid #e2e8f0;
-  color: #0f172a;
+  color: #fff;
+  background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+}
+
+.admin-audit-queue .queue-heading h2 {
+  color: #fff;
+}
+
+.admin-audit-queue .queue-heading p {
+  color: #e0f2fe;
 }
 
 .queue-heading h2 {
   margin: 0;
   font-size: .96rem;
-  color: #0f172a;
+  color: #fff;
 }
 
 .queue-heading p {
   margin: 4px 0 0;
-  color: #475569;
+  color: #e0f2fe;
   font-size: .76rem;
 }
 
@@ -535,8 +544,11 @@
   --admin-green: #168b5b;
 }
 
-.admin-main {
-  max-width: 1560px;
+.admin-dashboard .admin-main {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 .admin-workspace {
@@ -721,6 +733,7 @@
   .admin-sidebar {
     position: static;
     display: flex;
+    flex-direction: row;
     max-height: none;
     overflow-x: auto;
     overflow-y: hidden;
@@ -761,6 +774,14 @@
   }
 
   .admin-live-clock {
-    display: none;
+    display: inline-flex;
+    flex-basis: 100%;
+    white-space: normal;
+  }
+}
+
+@media (min-width: 701px) and (max-width: 1050px) {
+  .admin-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

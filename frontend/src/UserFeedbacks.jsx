@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
+import AdminPageLayout from './AdminPageLayout';
 import './UserFeedbacks.css';
 
 const getVisibleReplies = (replies = []) => replies.reduce((visibleReplies, reply) => {
@@ -97,13 +97,11 @@ const UserFeedbacks = () => {
   );
 
   return (
-    <main className="user-feedbacks-page">
-      <header className="user-feedbacks-compact-header">
-        <h1>💬 User Feedbacks / የተጠቃሚዎች አስተያየት</h1>
-        <Link to="/admin-dashboard" className="user-feedbacks-back">
-          <span aria-hidden="true">←</span> Back to Dashboard
-        </Link>
-      </header>
+    <AdminPageLayout
+      activePage="feedbacks"
+      title="User Feedbacks"
+      description="Review and reply to user feedback."
+    >
       <section className="user-feedbacks-panel">
         {error && <p role="alert" className="user-feedback-error">{error}</p>}
         <div className="user-feedbacks-list">
@@ -189,14 +187,7 @@ const UserFeedbacks = () => {
           )) : !error && <p className="user-feedback-empty">No user feedbacks available.</p>}
         </div>
       </section>
-      <footer className="user-feedbacks-compact-footer">
-        <p>© {new Date().getFullYear()} ኢ-ቀበሌ ፖርታል. መብቱ በህግ የተጠበቀ ነው።</p>
-        <nav aria-label="Footer navigation">
-          <Link to="/about">ስለ እኛ</Link>
-          <Link to="/contact">ያግኙን</Link>
-        </nav>
-      </footer>
-    </main>
+    </AdminPageLayout>
   );
 };
 

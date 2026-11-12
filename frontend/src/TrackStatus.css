@@ -553,6 +553,61 @@
   background: #f8fafc;
 }
 
+.track-application-id {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  background: #eff6ff;
+}
+
+.track-application-id > div {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+  color: #1e3a8a;
+}
+
+.track-application-id code {
+  overflow-wrap: anywhere;
+  color: #0f172a;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.track-copy-id-button {
+  flex: 0 0 auto;
+  padding: 9px 12px;
+  border: 1px solid #2563eb;
+  border-radius: 8px;
+  background: #2563eb;
+  color: white;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.track-copy-id-button:hover {
+  background: #1d4ed8;
+}
+
+.track-copy-id-button:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 2px;
+}
+
+.track-copy-id-feedback {
+  flex-basis: 100%;
+  margin: 0;
+  color: #b91c1c;
+  font-size: 0.78rem;
+}
+
 .track-result > p {
   margin: 0 0 10px;
   color: #334155;
@@ -571,6 +626,11 @@
 
   .track-search-form {
     grid-template-columns: 1fr;
+  }
+
+  .track-application-id {
+    align-items: flex-start;
+    flex-wrap: wrap;
   }
 
   .track-search-form label {

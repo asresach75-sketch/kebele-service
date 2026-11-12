@@ -6,21 +6,18 @@
 .brand-icon { display: grid; place-items: center; width: 31px; height: 31px; border: 2px solid white; border-radius: 5px; font-size: 1rem; }
 .officer-user { font-size: .95rem; }
 .officer-user button { padding: 8px 17px; border: 1px solid rgba(255,255,255,.8); border-radius: 6px; color: white; background: transparent; font-weight: 700; cursor: pointer; }
-.officer-main { max-width: 1360px; margin: 0 auto; padding: 45px 4vw 70px; }
+.officer-main { width: 100%; max-width: none; margin: 0; padding: 36px clamp(16px, 2.5vw, 36px) 64px; box-sizing: border-box; }
 .officer-heading { display: flex; align-items: end; justify-content: space-between; gap: 28px; margin-bottom: 28px; }
 .eyebrow { margin: 0 0 8px; color: #1769dc; font-size: .7rem; font-weight: 800; letter-spacing: .14em; }
 .officer-heading h1 { margin: 0 0 8px; font-size: clamp(1.7rem, 3vw, 2.55rem); letter-spacing: -.02em; }
 .officer-heading p:not(.eyebrow) { margin: 0; color: #617087; }
-.officer-count { min-width: 150px; padding: 16px 22px; border-left: 4px solid #1672ef; background: white; box-shadow: 0 5px 16px rgba(28, 52, 90, .06); }
-.officer-count strong, .officer-count span { display: block; }
-.officer-count strong { color: #1268dc; font-size: 1.6rem; }
-.officer-count span { color: #718096; font-size: .78rem; }
 .officer-filters { display: flex; align-items: end; gap: 16px; margin-bottom: 28px; padding: 18px; border: 1px solid #dce5f1; background: white; box-shadow: 0 5px 16px rgba(28, 52, 90, .05); }
 .officer-filters label { flex: 1; color: #445269; font-size: .78rem; font-weight: 800; }
 .officer-filters input, .officer-filters select { display: block; width: 100%; margin-top: 7px; padding: 11px 12px; border: 1px solid #cbd6e5; border-radius: 5px; background: #fbfdff; color: #172033; font: inherit; }
-.officer-status-tabs { display: flex; flex-wrap: wrap; gap: 9px; margin: -10px 0 20px; padding: 10px; border: 1px solid #dce5f1; border-radius: 8px; background: white; box-shadow: 0 5px 16px rgba(28, 52, 90, .05); }
-.officer-status-tabs button { display: inline-flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1px solid #dce5f1; border-radius: 6px; color: #445269; background: #fff; font: inherit; font-size: .82rem; font-weight: 750; cursor: pointer; }
-.officer-status-tabs button strong { min-width: 22px; padding: 2px 6px; border-radius: 12px; color: #445269; background: #eef2f6; text-align: center; }
+.officer-status-tabs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; margin: -10px 0 20px; padding: 10px; border: 1px solid #dce5f1; border-radius: 8px; background: white; box-shadow: 0 5px 16px rgba(28, 52, 90, .05); }
+.officer-status-tabs button { display: inline-flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; padding: 10px 14px; border: 1px solid #dce5f1; border-radius: 6px; color: #445269; background: #fff; font: inherit; font-size: .82rem; font-weight: 750; text-align: left; cursor: pointer; }
+.officer-status-tabs button span { min-width: 0; overflow-wrap: anywhere; }
+.officer-status-tabs button strong { flex: 0 0 auto; min-width: 22px; padding: 2px 6px; border-radius: 12px; color: #445269; background: #eef2f6; text-align: center; }
 .officer-status-tabs button.active { border-color: #1769dc; color: #fff; background: #1769dc; }
 .officer-status-tabs button.active strong { color: #1769dc; background: #fff; }
 .refresh-button, .details-button, .approve-button { padding: 10px 14px; border-radius: 5px; font-weight: 700; cursor: pointer; white-space: nowrap; }
@@ -70,7 +67,7 @@ td small { display: block; margin-top: 3px; color: #8592a5; font-size: .7rem; }
 .document-preview-content img { display: block; max-width: 100%; max-height: calc(100vh - 150px); object-fit: contain; }
 .document-preview-content iframe { width: 100%; height: min(78vh, 900px); min-height: 360px; border: 0; background: white; }
 .document-preview-original { align-self: flex-end; margin: 12px 18px; color: #145ec4; font-size: .82rem; font-weight: 700; }
-@media (max-width: 700px) { .officer-header { padding: 14px 5vw; align-items: flex-start; flex-direction: column; }.officer-user { width: 100%; justify-content: space-between; flex-wrap: wrap; }.officer-main { padding: 30px 4vw; }.officer-heading { align-items: stretch; flex-direction: column; }.officer-count { border-left: 0; border-top: 3px solid #1672ef; }.officer-filters { align-items: stretch; flex-direction: column; }.officer-filters label { flex: auto; }.review-backdrop { align-items: start; padding: 10px; }.review-dialog { max-height: calc(100vh - 20px); padding: 16px; }.review-details-grid, .review-documents { grid-template-columns: 1fr; }.review-actions { justify-content: stretch; }.review-actions button { flex: 1; } }
+@media (max-width: 700px) { .officer-header { padding: 14px 5vw; align-items: flex-start; flex-direction: column; }.officer-user { width: 100%; justify-content: space-between; flex-wrap: wrap; }.officer-main { padding: 30px 4vw; }.officer-heading { align-items: stretch; flex-direction: column; }.officer-filters { align-items: stretch; flex-direction: column; }.officer-filters label { flex: auto; }.review-backdrop { align-items: start; padding: 10px; }.review-dialog { max-height: calc(100vh - 20px); padding: 16px; }.review-details-grid, .review-documents { grid-template-columns: 1fr; }.review-actions { justify-content: stretch; }.review-actions button { flex: 1; } }
 @media (max-width: 700px) { .officer-bulk-actions { align-items: stretch; flex-wrap: wrap; }.officer-bulk-actions > span { margin-left: 0; }.document-preview-backdrop { padding: 10px; }.document-preview-dialog { max-height: calc(100vh - 20px); }.document-preview-content iframe { min-height: 55vh; } }
 
 .officer-header { position: sticky; top: 0; z-index: 40; min-height: 68px; border-bottom: 1px solid #26354b; background: #0f172a; box-shadow: 0 8px 20px rgba(15, 23, 42, .14); }
@@ -87,7 +84,8 @@ td small { display: block; margin-top: 3px; color: #8592a5; font-size: .7rem; }
 .officer-section tbody tr { transition: background .15s ease; }
 .officer-section tbody tr:hover { background: #f8fafc; }
 @media (max-width: 700px) { .officer-filters { grid-template-columns: minmax(0, 1fr); } }
-@media (max-width: 700px) { .officer-status-tabs button { flex: 1 1 calc(50% - 9px); justify-content: space-between; } }
+@media (max-width: 1000px) { .officer-status-tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 700px) { .officer-status-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
 .officer-section {
 	border: 1px solid #dbe4ef;
@@ -122,7 +120,7 @@ td small { display: block; margin-top: 3px; color: #8592a5; font-size: .7rem; }
 }
 
 .officer-section th {
-	padding: 14px 16px;
+	padding: 12px 16px;
 	border-bottom: 1px solid #e2e8f0;
 	color: #475569;
 	font-size: .72rem;
@@ -131,7 +129,7 @@ td small { display: block; margin-top: 3px; color: #8592a5; font-size: .7rem; }
 }
 
 .officer-section td {
-	padding: 14px 16px;
+	padding: 12px 16px;
 	color: #334155;
 	line-height: 1.5;
 }
@@ -147,6 +145,10 @@ td small { display: block; margin-top: 3px; color: #8592a5; font-size: .7rem; }
 .officer-section td strong {
 	color: #172033;
 	overflow-wrap: anywhere;
+}
+
+.applicant-name {
+	text-transform: capitalize;
 }
 
 .officer-section td small {

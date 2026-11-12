@@ -64,9 +64,11 @@
 }
 
 .finance-main {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 34px 5vw 72px;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 34px clamp(16px, 2.5vw, 36px) 72px;
+  box-sizing: border-box;
 }
 
 .finance-title {
@@ -150,6 +152,22 @@
 .finance-error {
   background: #fef2f2;
   color: #b91c1c;
+}
+
+.finance-error button {
+  margin-left: 12px;
+  padding: 7px 11px;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  background: #fff;
+  color: #991b1b;
+  font: inherit;
+  cursor: pointer;
+}
+
+.finance-error button:focus-visible {
+  outline: 3px solid #fca5a5;
+  outline-offset: 2px;
 }
 
 .finance-summary-grid {

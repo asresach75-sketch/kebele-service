@@ -134,7 +134,7 @@ const Login = () => {
         <header className="login-site-header">
           <Link to="/" className="login-back-link">
             <span className="back-arrow" aria-hidden="true">←</span>
-            <span>{lang === 'am' ? 'ወደ መነሻ ገጽ' : 'Back to Home'}</span>
+            <span>{t.backHome}</span>
           </Link>
 
           <div className="login-header-brand">
@@ -165,7 +165,7 @@ const Login = () => {
                 <span className="language-menu-chevron" aria-hidden="true">{languageMenuOpen ? '▲' : '▼'}</span>
               </button>
               {languageMenuOpen && (
-                <div className="language-menu" role="menu" aria-label={lang === 'am' ? 'Хэл сонгох' : 'Choose language'}>
+                <div className="language-menu" role="menu" aria-label={lang === 'am' ? 'ቋንቋ ይምረጡ' : 'Choose language'}>
                   <button
                     type="button"
                     role="menuitem"
@@ -199,8 +199,8 @@ const Login = () => {
         <div className="login-card-wrap">
           <div className="login-card">
             <div className="login-card-intro">
-              <h2 className="login-card-title">{lang === 'am' ? 'መለያዎ ይግቡ' : 'Sign In'}</h2>
-              <p>{lang === 'am' ? 'አገልግሎት ለማግኘት ኢሜይልና የይለፍ ቃል ያስገቡ' : 'Enter your credentials to access services'}</p>
+              <h2 className="login-card-title">{t.signInTitle}</h2>
+              <p>{t.loginIntro}</p>
             </div>
 
             {error && (
@@ -229,7 +229,7 @@ const Login = () => {
                   value={formData.identifier}
                   onChange={handleChange}
                   required
-                  placeholder={lang === 'am' ? 'ለምሳሌ example@gmail.com ወይም 0911123456' : 'e.g. example@gmail.com or 0911123456'}
+                  placeholder={t.loginExample}
                 />
               </div>
 
@@ -237,7 +237,7 @@ const Login = () => {
                 <div className="form-label-row">
                   <label htmlFor="login-password">{t.password}</label>
                     <Link to="/forgot-password" className="form-footnote-link">
-                    {lang === 'am' ? 'የይለፍ ቃል ረስተዋል?' : 'Forgot password?'}
+                    {t.forgotPassword}
                   </Link>
                 </div>
                 <div className="password-input-wrap">
@@ -270,17 +270,17 @@ const Login = () => {
                   checked={rememberMe}
                   onChange={(event) => setRememberMe(event.target.checked)}
                 />
-                <span>{lang === 'am' ? 'አስታውሰኝ' : 'Remember me'}</span>
+                <span>{t.rememberMe}</span>
               </label>
 
               <button type="submit" disabled={loading} className="login-submit">
-                {loading ? (lang === 'am' ? 'በመግባት ላይ...' : 'Logging in...') : (lang === 'am' ? 'ግባ' : 'Log in')}
+                {loading ? t.loggingIn : t.loginSubmit}
               </button>
             </form>
 
             <p className="signup-text">
-              {lang === 'am' ? 'መለያ የለዎትም?' : "Don't have an account? "}
-              <Link to="/signup">{lang === 'am' ? 'ይመዝገቡ' : 'Sign up'}</Link>
+              {t.signupPrompt}{' '}
+              <Link to="/signup">{t.signup}</Link>
             </p>
           </div>
         </div>

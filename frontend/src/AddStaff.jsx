@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import AdminPageLayout from './AdminPageLayout';
 import './AddStaff.css';
 
 const initialForm = { fullName: '', email: '', phone: '', role: 'officer', password: '' };
@@ -36,7 +37,7 @@ const AddStaff = () => {
       await axios.post('/api/users/staff', formData, {
         headers: { Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}` }
       });
-      navigate('/admin-dashboard');
+      navigate('/admin-users');
     } catch (error) {
       setMessage(error.response?.data?.message || 'Unable to create staff account.');
     } finally {
@@ -45,24 +46,17 @@ const AddStaff = () => {
   };
 
   return (
-    <div className="add-staff-page">
-      <header className="add-staff-header">
-        <div className="add-staff-header-inner">
-          <div className="add-staff-brand">
-            <span className="add-staff-brand-mark" aria-hidden="true">ኢ</span>
-            <div><strong>ኢ-ቀበሌ / E-Kebele</strong><span>Admin Portal</span></div>
-          </div>
-          <button type="button" onClick={() => navigate('/admin-dashboard')} className="add-staff-dashboard-link">
-            Dashboard
-          </button>
-        </div>
-      </header>
-      <main className="add-staff-main">
+    <AdminPageLayout
+      activePage="add-staff"
+      title="Add Staff"
+      description="Manage staff accounts and access."
+    >
+      <div className="admin-page-content">
         <section className="add-staff-card">
           <div className="add-staff-card-heading">
             <div>
               <span className="add-staff-eyebrow">STAFF MANAGEMENT</span>
-              <h1>Add New Staff / አዲስ ሰራተኛ</h1>
+              <h1>New Staff Account</h1>
             </div>
             <button type="button" onClick={() => navigate('/admin-dashboard')} className="add-staff-back-link">
               ← Back
@@ -78,11 +72,8 @@ const AddStaff = () => {
             <button type="submit" disabled={submitting} className="add-staff-submit">{submitting ? 'Saving...' : 'Save Staff Account'}</button>
           </form>
         </section>
-      </main>
-      <footer className="add-staff-footer">
-        © 2026 E-Kebele Portal · የቀበሌ ዲጂታል አገልግሎት ስርዓት
-      </footer>
-    </div>
+      </div>
+    </AdminPageLayout>
   );
 };
 

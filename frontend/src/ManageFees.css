@@ -74,10 +74,9 @@
 }
 
 .manage-fees-main {
-  flex: 1;
-  width: min(100% - 32px, 900px);
-  margin: 0 auto;
-  padding: 28px 0;
+  width: 100%;
+  margin: 0;
+  padding: 0 0 20px;
 }
 
 .manage-fees-title {
@@ -89,6 +88,8 @@
 }
 
 .manage-fees-eyebrow {
+  display: block;
+  margin: 0 0 10px;
   color: #1d4ed8;
   font-size: .62rem;
   font-weight: 800;
@@ -179,7 +180,7 @@
 .manage-fee-row button:disabled { cursor: wait; opacity: .65; }
 .manage-fee-row button:hover:not(:disabled) { background: #f0b429; }
 @media (max-width: 560px) {
-  .manage-fees-main { width: min(100% - 24px, 900px); padding: 20px 0; }
+  .manage-fees-main { padding: 0 0 14px; }
   .manage-fees-title { flex-direction: column; gap: 12px; }
   .manage-fees-card { padding: 6px 14px; }
   .manage-fee-row { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }

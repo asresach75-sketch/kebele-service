@@ -45,6 +45,7 @@ function FinanceDashboard() {
   const [dateFrom, setDateFrom] = useState(() => localDateKey(new Date()));
   const [dateTo, setDateTo] = useState(() => localDateKey(new Date()));
   const loadingRequest = useRef(false);
+  const activeRequestId = useRef(0);
   const previousApplicationIds = useRef(null);
   const navigate = useNavigate();
   const { lang, toggleLanguage } = useLanguage();
@@ -54,9 +55,22 @@ function FinanceDashboard() {
   const loadApplications = async () => {
     if (loadingRequest.current) return;
     loadingRequest.current = true;
+    const requestId = activeRequestId.current + 1;
+    activeRequestId.current = requestId;
     setLoading(true);
+    setError('');
     const controller = new AbortController();
-    const timeout = window.setTimeout(() => controller.abort(), 10000);
+    const timeout = window.setTimeout(() => {
+      controller.abort();
+      if (requestId === activeRequestId.current) {
+        loadingRequest.current = false;
+        setError(text(
+          'The payment service took too long to respond. Check the backend and try again.',
+          'የክፍያ አገልግሎቱ ምላሽ ለመስጠት ዘግይቷል። Backend-ን ያረጋግጡና ደግመው ይሞክሩ።'
+        ));
+        setLoading(false);
+      }
+    }, 10000);
 
     try {
       const response = await fetch('/api/services/all', {
@@ -65,7 +79,9 @@ function FinanceDashboard() {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Unable to load payment records');
-      const nextApplications = Array.isArray(data) ? data : [];
+      if (!Array.isArray(data)) throw new Error('The server returned an invalid payment records response.');
+      if (requestId !== activeRequestId.current) return;
+      const nextApplications = data;
       const previousIds = previousApplicationIds.current;
       const nextIds = new Set(nextApplications.map((item) => item._id).filter(Boolean));
       if (previousIds) {
@@ -86,13 +102,20 @@ function FinanceDashboard() {
       setApplications(nextApplications);
       setError('');
     } catch (requestError) {
-      setError(requestError.name === 'AbortError'
-        ? 'The payment service took too long to respond.'
-        : requestError.message);
+      if (requestId === activeRequestId.current) {
+        setError(requestError.name === 'AbortError'
+          ? text(
+            'The payment service took too long to respond. Check the backend and try again.',
+            'የክፍያ አገልግሎቱ ምላሽ ለመስጠት ዘግይቷል። Backend-ን ያረጋግጡና ደግመው ይሞክሩ።'
+          )
+          : requestError.message || text('Unable to load payment records.', 'የክፍያ መዝገቦችን ማምጣት አልተቻለም።'));
+      }
     } finally {
       window.clearTimeout(timeout);
-      loadingRequest.current = false;
-      setLoading(false);
+      if (requestId === activeRequestId.current) {
+        loadingRequest.current = false;
+        setLoading(false);
+      }
     }
   };
 
@@ -356,7 +379,14 @@ function FinanceDashboard() {
         </div>
 
         {loading && <div className="finance-message">{text('Loading payment records...', 'የክፍያ መዝገቦችን በመጫን ላይ...')}</div>}
-        {error && <div className="finance-message finance-error">{error}</div>}
+        {error && (
+          <div className="finance-message finance-error" role="alert">
+            <span>{error}</span>
+            <button type="button" onClick={loadApplications} disabled={loading}>
+              {text('Try again', 'ደግመው ይሞክሩ')}
+            </button>
+          </div>
+        )}
 
         {!loading && !error && (
           <>

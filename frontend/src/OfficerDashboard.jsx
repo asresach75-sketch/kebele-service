@@ -365,7 +365,7 @@ function OfficerDashboard() {
       <td><input type="checkbox" aria-label={`${text('Select', 'ይምረጡ')} ${getName(application)}`} checked={PENDING_STATUSES.includes(status) && selectedIds.includes(application._id)} disabled={!PENDING_STATUSES.includes(status) || updatingStatus} onChange={(event) => toggleApplication(application._id, event.target.checked)} /></td>
       <td className="officer-id">#{application.applicationId || application._id?.slice(-6)}</td>
       <td>{photo ? <img className="officer-photo" src={photoUrl(photo)} alt={text('Applicant', 'አመልካች')} /> : <span className="photo-placeholder">ID</span>}</td>
-      <td><strong>{getName(application)}</strong><small>{application.email || text('No email', 'ኢሜይል የለም')}</small></td>
+      <td><strong className="applicant-name">{getName(application)}</strong><small>{application.email || text('No email', 'ኢሜይል የለም')}</small></td>
       <td>{age === null ? text('Not provided', 'አልቀረበም') : <span className={age >= 18 ? 'age-valid' : 'age-warning'}>{age >= 18 ? '✓ ' : ''}{age} {text('years', 'ዓመት')}</span>}</td>
       <td className="phone-cell">✓ {getPhone(application)}</td>
       <td><span className="status-file">{localizeService(application.serviceType)}</span></td>
@@ -401,14 +401,7 @@ function OfficerDashboard() {
       </div>
     </header>
     <main className="officer-main">
-      <section className="officer-visual" aria-label={isAmharic ? 'የቀበሌ ኦፊሰር ዳሽቦርድ' : 'Kebele Officer Dashboard'}>
-        <div className="officer-visual-image">
-          <img src="/images/ethiopian-kebele-office-hero.png" alt={isAmharic ? 'በዘመናዊ የቀበሌ አገልግሎት ቢሮ ውስጥ ዜጎችና ኦፊሰሮች' : 'Citizens and officers in a modern Ethiopian Kebele service office'} />
-        </div>
-        <div className="officer-visual-overlay" aria-hidden="true" />
-        <h1 className="officer-visual-title">{isAmharic ? 'የቀበሌ ኦፊሰር ዋና ዳሽቦርድ' : 'KEBELE OFFICER MAIN DASHBOARD'}</h1>
-      </section>
-      <div className="officer-heading"><div><p className="eyebrow">{text('APPLICATION QUEUE', 'የማመልከቻ ወረፋ')}</p><h2>{text('Review and approve requests', 'ማመልከቻዎችን ይገምግሙ እና ያጽድቁ')}</h2><p>{text('Filter applicants by age, phone number, or photo.', 'አመልካቾችን በዕድሜ፣ በስልክ ቁጥር ወይም በፎቶ ይፈልጉ።')}</p></div><div className="officer-count"><strong>{applications.length}</strong><span>{text('Total applications', 'ጠቅላላ ማመልከቻዎች')}</span></div></div>
+      <div className="officer-heading"><div><p className="eyebrow">{text('APPLICATION QUEUE', 'የማመልከቻ ወረፋ')}</p><h2>{text('Review and approve requests', 'ማመልከቻዎችን ይገምግሙ እና ያጽድቁ')}</h2><p>{text('Filter applicants by age, phone number, or photo.', 'አመልካቾችን በዕድሜ፣ በስልክ ቁጥር ወይም በፎቶ ይፈልጉ።')}</p></div></div>
       <div className="officer-filters">
         <label>{text('Search applications', 'ማመልከቻዎችን ይፈልጉ')}<input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={text('Name, phone, ID number...', 'ስም፣ ስልክ ወይም የመታወቂያ ቁጥር...')} /></label>
         <label>{text('Age filter', 'የዕድሜ ማጣሪያ')}<select value={ageFilter} onChange={(event) => setAgeFilter(event.target.value)}><option value="all">{text('All ages', 'ሁሉም ዕድሜዎች')}</option><option value="adult">{text('18 years and above', '18 ዓመት እና ከዚያ በላይ')}</option><option value="underage">{text('Under 18', 'ከ18 ዓመት በታች')}</option></select></label>
@@ -425,7 +418,7 @@ function OfficerDashboard() {
     {selectedApplication && <div className="review-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedApplication(null); }}>
       <section className="review-dialog" role="dialog" aria-modal="true" aria-labelledby="review-title">
         <header className="review-dialog-header">
-          <div><p className="eyebrow">{text('APPLICATION REVIEW', 'የማመልከቻ ግምገማ')}</p><h2 id="review-title">{getName(selectedApplication)}</h2><p>#{selectedApplication.applicationId || selectedApplication._id}</p></div>
+          <div><p className="eyebrow">{text('APPLICATION REVIEW', 'የማመልከቻ ግምገማ')}</p><h2 id="review-title" className="applicant-name">{getName(selectedApplication)}</h2><p>#{selectedApplication.applicationId || selectedApplication._id}</p></div>
           <button type="button" className="review-close" aria-label={text('Close details', 'ዝርዝሩን ዝጋ')} onClick={() => setSelectedApplication(null)}>×</button>
         </header>
         <div className="review-details-grid">

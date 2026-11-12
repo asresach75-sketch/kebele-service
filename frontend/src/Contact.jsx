@@ -22,6 +22,8 @@ const Contact = () => {
       if (response.data.success) {
         setStatusMsg({ type: 'success', text: text.success });
         setFormData(emptyForm);
+      } else {
+        setStatusMsg({ type: 'error', text: response.data.message || text.error });
       }
     } catch (requestError) {
       const serverMessage = requestError.response?.data?.message;
@@ -47,7 +49,7 @@ const Contact = () => {
         </header>
 
         <section className="space-y-8">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {infoCards.map(([icon, heading, content]) => (
               <article key={heading} className="flex flex-col items-center rounded-2xl border border-slate-200 bg-white p-5 text-center shadow-sm">
                 <div className="mb-3 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-blue-50 text-2xl" aria-hidden="true">{icon}</div>
@@ -59,9 +61,17 @@ const Contact = () => {
             ))}
           </div>
 
-          <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,0.08)] sm:p-8">
+          <section className="mx-auto w-full max-w-5xl rounded-[28px] border border-slate-200 bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,0.08)] sm:p-8">
             <h2 className="mb-6 flex items-center gap-2 border-b border-slate-100 pb-4 text-xl font-bold text-slate-800">💬 {text.sendMessageTitle}</h2>
-            {statusMsg.text && <div className={`mb-6 rounded-xl p-3 text-center text-sm font-bold ${statusMsg.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{statusMsg.text}</div>}
+            {statusMsg.text && (
+              <div
+                role={statusMsg.type === 'success' ? 'status' : 'alert'}
+                aria-live={statusMsg.type === 'success' ? 'polite' : 'assertive'}
+                className={`mb-6 rounded-xl p-3 text-center text-sm font-bold ${statusMsg.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
+              >
+                {statusMsg.text}
+              </div>
+            )}
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                 <label className="block">

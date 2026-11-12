@@ -96,7 +96,7 @@ function Signup() {
 
   return (
     <div style={{ maxWidth: '350px', margin: '50px auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px', fontFamily: 'sans-serif', boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}>
-      <h2 style={{ textAlign: 'center' }}>{lang === 'am' ? 'መለያ ይፍጠሩ' : 'Create an Account (Signup)'}</h2>
+      <h2 style={{ textAlign: 'center' }}>{t.createAccountTitle}</h2>
       {errorMessage && (
         <div role="alert" aria-live="assertive" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginBottom: '16px', padding: '12px 14px', border: '1px solid #fecaca', borderLeft: '4px solid #dc2626', borderRadius: '8px', background: '#fef2f2', color: '#b91c1c', fontSize: '14px', lineHeight: 1.5 }}>
           <span>{errorMessage}</span>
@@ -109,7 +109,7 @@ function Signup() {
           <input 
             type="text" 
             name="fullName" 
-            placeholder="ሙሉ ስም ያስገቡ" 
+            placeholder={t.signupFullNamePlaceholder}
             value={formData.fullName}
             onChange={handleChange} 
             required 
@@ -149,7 +149,7 @@ function Signup() {
           <input 
             type="password" 
             name="password" 
-            placeholder="የይለፍ ቃል ያስገቡ" 
+            placeholder={t.signupPasswordPlaceholder}
             value={formData.password}
             onChange={handleChange} 
             required 

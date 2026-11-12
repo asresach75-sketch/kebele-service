@@ -48,7 +48,11 @@ const serviceRequestSchema = new mongoose.Schema({
     enum: ['NOT_REQUIRED', 'VERIFIED', 'PENDING_MANUAL'],
     default: 'NOT_REQUIRED'
   },
-  renewalReason: { type: String, enum: ['EXPIRED', 'LOST', 'DAMAGED'] },
+  renewalReason: {
+    type: String,
+    enum: ['EXPIRED', 'LOST', 'DAMAGED'],
+    set: (value) => (typeof value === 'string' && !value.trim() ? undefined : value)
+  },
   idExpiryDate: { type: String },
   applicationId: { type: String, unique: true, required: true },
   paymentAmount: { type: Number, default: 150 },

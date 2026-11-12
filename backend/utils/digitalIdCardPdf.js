@@ -74,9 +74,9 @@ const createDigitalIdCardPdf = async (service) => {
     document.roundedRect(8, 8, 524, 324, 16).fill('#f8fafc');
     document.roundedRect(8, 8, 524, 72, 16).fill('#0b4d9c');
     document.rect(8, 64, 524, 16).fill('#0b4d9c');
-    document.rect(24, 10, 164, 4).fill('#078930');
-    document.rect(188, 10, 164, 4).fill('#FCDD09');
-    document.rect(352, 10, 164, 4).fill('#DA121A');
+    document.rect(24, 10, 164, 2).fill('#078930');
+    document.rect(188, 10, 164, 2).fill('#FCDD09');
+    document.rect(352, 10, 164, 2).fill('#DA121A');
     document.fillColor('#ffffff').font('Helvetica-Bold').fontSize(17)
       .text('E-KEBELE DIGITAL ID', 28, 27, { width: 484, align: 'center' });
     document.font('Helvetica').fontSize(9)
@@ -108,20 +108,20 @@ const createDigitalIdCardPdf = async (service) => {
       .text(service.nationality || 'Ethiopian', 282, 184, { width: 122 })
       .text(formatCardDate(expiryDate), 282, 221, { width: 122 });
 
-    document.image(qrCode, 418, 94, { fit: [96, 96] });
+    document.image(qrCode, 28, 236, { fit: [64, 64] });
     document.fillColor('#334155').font('Helvetica-Bold').fontSize(7)
-      .text('SCAN TO VERIFY', 416, 195, { width: 100, align: 'center' });
+      .text('SCAN TO VERIFY', 24, 301, { width: 72, align: 'center' });
 
     document.moveTo(24, 232).lineTo(516, 232).lineWidth(1).strokeColor('#dbe3ee').stroke();
     document.fillColor('#64748b').font('Helvetica-Bold').fontSize(8)
-      .text('ADDRESS', 28, 240)
-      .text('EMERGENCY CONTACT', 28, 289)
-      .text('FINANCE VERIFIED BY', 350, 240);
+      .text('ADDRESS', 112, 238)
+      .text('EMERGENCY CONTACT', 112, 285)
+      .text('FINANCE VERIFIED BY', 350, 238);
     document.fillColor('#172033').font('Helvetica').fontSize(9)
-      .text(`Region: ${service.region || 'Not recorded'}`, 28, 251, { width: 300, height: 12, ellipsis: true })
-      .text(`Zone: ${service.zone || 'Not recorded'}`, 28, 263, { width: 300, height: 12, ellipsis: true })
-      .text(`Woreda / Kebele: ${[service.woreda, service.kebele].filter(Boolean).join(', ') || 'Not recorded'}`, 28, 275, { width: 300, height: 12, ellipsis: true })
-      .text(`${emergencyName} · ${emergencyPhone}`, 28, 301, { width: 310, height: 12, ellipsis: true })
+      .text(`Region: ${service.region || 'Not recorded'}`, 112, 249, { width: 218, height: 12, ellipsis: true })
+      .text(`Zone: ${service.zone || 'Not recorded'}`, 112, 261, { width: 218, height: 12, ellipsis: true })
+      .text(`Woreda / Kebele: ${[service.woreda, service.kebele].filter(Boolean).join(', ') || 'Not recorded'}`, 112, 273, { width: 218, height: 12, ellipsis: true })
+      .text(`${emergencyName} · ${emergencyPhone}`, 112, 296, { width: 218, height: 12, ellipsis: true })
       .text(issuedBy, 350, 252, { width: 105, height: 28, ellipsis: true });
 
     document.circle(484, 278, 24).lineWidth(1.5).strokeColor('#0b4d9c').stroke();
@@ -132,8 +132,8 @@ const createDigitalIdCardPdf = async (service) => {
 
     document.moveTo(24, 316).lineTo(516, 316).lineWidth(1).strokeColor('#dbe3ee').stroke();
     document.fillColor('#475569').font('Helvetica').fontSize(7)
-      .text(`Issued ${formatCardDate(issueDate)}`, 28, 322)
-      .text('E-Kebele portal card; not a government-issued national ID.', 28, 332, { width: 484, align: 'center' });
+      .text(`Issued ${formatCardDate(issueDate)}`, 28, 320)
+      .text('E-Kebele portal card; not a government-issued national ID.', 28, 328, { width: 484, align: 'center' });
 
     document.end();
   });

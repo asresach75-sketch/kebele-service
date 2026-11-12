@@ -85,6 +85,7 @@ const NAME_PATTERN = '[A-Za-z\\u1200-\\u135A ]+';
 function NewIDApplicationForm() {
   const location = useLocation();
   const navigate = useNavigate();
+  const formRef = useRef(null);
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const fileInputRefs = useRef({});
@@ -103,8 +104,10 @@ function NewIDApplicationForm() {
   const [fieldErrors, setFieldErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [sameAsBirthPlace, setSameAsBirthPlace] = useState(false);
+  const [wizardStep, setWizardStep] = useState(0);
   const serviceType = new URLSearchParams(location.search).get('type') === 'ID_RENEWAL' || location.pathname === '/renew-id' ? 'ID_RENEWAL' : 'NEW_ID_CARD';
   const isTransfer = form.isTransfer === true;
+  const usesWizard = serviceType === 'NEW_ID_CARD';
 
   useEffect(() => () => streamRef.current?.getTracks().forEach((track) => track.stop()), []);
   useEffect(() => {
@@ -309,6 +312,41 @@ function NewIDApplicationForm() {
       }));
     }
   };
+  const goToWizardStep = (nextStep) => {
+    if (nextStep < wizardStep) {
+      if (cameraOpen) stopCamera();
+      setMessage('');
+      setWizardStep(nextStep);
+      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+
+    const invalidControl = Array.from(formRef.current?.querySelectorAll('input, select, textarea') || [])
+      .find((control) => !control.checkValidity());
+    if (invalidControl) {
+      invalidControl.reportValidity();
+      return;
+    }
+
+    if (wizardStep === 0 && getAge(form.dateOfBirth) === null) {
+      setMessage(text('Enter a valid date of birth between today and 120 years ago.', 'ዛሬን እና ከ120 ዓመት በፊትን የሚያካትት ትክክለኛ የትውልድ ቀን ያስገቡ።'));
+      return;
+    }
+    if (wizardStep === 1 && form.emergencyContactName.trim() && !isValidApplicantName(form.emergencyContactName)) {
+      const error = text(
+        'Each emergency contact name part must contain at least 3 letters.',
+        'እያንዳንዱ የአደጋ ጊዜ ተጠሪ ስም ክፍል ቢያንስ 3 ፊደላት መያዝ አለበት።'
+      );
+      setFieldErrors((current) => ({ ...current, emergencyContactName: error }));
+      setMessage(error);
+      return;
+    }
+
+    setFieldErrors((current) => ({ ...current, emergencyContactName: '' }));
+    setMessage('');
+    setWizardStep(nextStep);
+    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
   const fileChange = (event) => {
     const { name, files: selectedFiles } = event.target;
     const file = selectedFiles?.[0] || null;
@@ -449,6 +487,7 @@ function NewIDApplicationForm() {
     setSameAsBirthPlace(false);
     setMessage('');
     setFieldErrors({});
+    setWizardStep(0);
     Object.values(fileInputRefs.current).forEach((input) => {
       if (input) input.value = '';
     });
@@ -625,9 +664,10 @@ function NewIDApplicationForm() {
       ? parts.filter((part) => /[\u1200-\u137F]/.test(part)).join(' / ') || parts[parts.length - 1]
       : parts.filter((part) => /[A-Za-z]/.test(part) && !/[\u1200-\u137F]/.test(part)).join(' / ') || parts[0];
   };
-  const select = (name, label, options, required = false, disabled = false, onChange = change) => <label className="new-id-field">{label}{required && ' *'}<select name={name} value={form[name]} onChange={onChange} required={required} disabled={disabled}><option value="">{text('Select', 'ይምረጡ')}</option>{options.map(([value, optionText]) => <option key={value} value={value}>{optionLabel(optionText)}</option>)}</select></label>;
+  const select = (name, label, options, required = false, disabled = false, onChange = change) => <label className={`new-id-field new-id-select-${name}`}>{label}{required && ' *'}<select name={name} value={form[name]} onChange={onChange} required={required} disabled={disabled}><option value="">{text('Select', 'ይምረጡ')}</option>{options.map(([value, optionText]) => <option key={value} value={value}>{optionLabel(optionText)}</option>)}</select></label>;
   const upload = (name, label, accept) => {
     if (name === 'emergencyBirthCertificate') return null;
+    const isRenewalPhoto = serviceType === 'ID_RENEWAL' && name === 'passportPhoto';
 
     const requirement = name === 'passportPhoto'
       ? text('Required if no captured photo is provided', 'በካሜራ ካልተነሳ ግዴታ')
@@ -644,42 +684,65 @@ function NewIDApplicationForm() {
           : text('Optional', 'አማራጭ');
 
     return (
-      <div key={name} className="new-id-upload-wrap">
-        <label className="new-id-upload">
-          {label} <span className="new-id-upload-requirement">({requirement})</span>
-          <input
-            ref={(element) => { fileInputRefs.current[name] = element; }}
-            name={name}
-            type="file"
-            accept={accept}
-            onChange={fileChange}
-            required={(serviceType === 'NEW_ID_CARD' && name === 'birthCertificate')
-              || (serviceType === 'ID_RENEWAL' && form.renewalReason === 'EXPIRED' && name === 'previousIdDocument')
-              || (serviceType === 'ID_RENEWAL' && form.renewalReason === 'LOST' && name === 'policeReport')
-              || (serviceType === 'ID_RENEWAL' && form.renewalReason === 'DAMAGED' && name === 'damagedIdDocument')}
-          />
-        </label>
-        {files[name] && (
-          <div className="new-id-file-preview">
-            <div className="new-id-selected-file">
-              <span className="new-id-file-type" aria-hidden="true">{files[name].type === 'application/pdf' ? 'PDF' : 'IMG'}</span>
-              <span className="new-id-file-name" title={files[name].name}>{files[name].name}</span>
-              <button type="button" className="new-id-remove-file" onClick={() => removeFile(name)} aria-label={text(`Remove ${label}`, `${label} አስወግድ`)}>
-                {text('Remove', 'አስወግድ')}
-              </button>
+      <div key={name} className={`new-id-upload-wrap${isRenewalPhoto ? ' new-id-renewal-photo-upload' : ''}`}>
+        <div className={isRenewalPhoto ? 'new-id-renewal-photo-controls' : undefined}>
+          <label className="new-id-upload">
+            {label} <span className="new-id-upload-requirement">({requirement})</span>
+            <input
+              ref={(element) => { fileInputRefs.current[name] = element; }}
+              name={name}
+              type="file"
+              accept={accept}
+              onChange={fileChange}
+              required={(serviceType === 'NEW_ID_CARD' && name === 'birthCertificate')
+                || (serviceType === 'ID_RENEWAL' && form.renewalReason === 'EXPIRED' && name === 'previousIdDocument')
+                || (serviceType === 'ID_RENEWAL' && form.renewalReason === 'LOST' && name === 'policeReport')
+                || (serviceType === 'ID_RENEWAL' && form.renewalReason === 'DAMAGED' && name === 'damagedIdDocument')}
+            />
+          </label>
+          {files[name] && (
+            <div className="new-id-file-preview">
+              <div className="new-id-selected-file">
+                <span className="new-id-file-type" aria-hidden="true">{files[name].type === 'application/pdf' ? 'PDF' : 'IMG'}</span>
+                <span className="new-id-file-name" title={files[name].name}>{files[name].name}</span>
+                <button type="button" className="new-id-remove-file" onClick={() => removeFile(name)} aria-label={text(`Remove ${label}`, `${label} አስወግድ`)}>
+                  {text('Remove', 'አስወግድ')}
+                </button>
+              </div>
+              {name !== 'passportPhoto' && files[name].type.startsWith('image/') && documentPreviewUrls[name] && (
+                <img className="new-id-photo-preview" src={documentPreviewUrls[name]} alt={text(`${label} preview`, `${label} ቅድመ እይታ`)} />
+              )}
+              {name !== 'passportPhoto' && files[name].type === 'application/pdf' && documentPreviewUrls[name] && (
+                <a className="new-id-document-preview" href={documentPreviewUrls[name]} target="_blank" rel="noreferrer">
+                  {text('Preview PDF', 'የPDF ቅድመ እይታ')}
+                </a>
+              )}
             </div>
-            {name !== 'passportPhoto' && files[name].type.startsWith('image/') && documentPreviewUrls[name] && (
-              <img className="new-id-photo-preview" src={documentPreviewUrls[name]} alt={text(`${label} preview`, `${label} ቅድመ እይታ`)} />
-            )}
-            {name !== 'passportPhoto' && files[name].type === 'application/pdf' && documentPreviewUrls[name] && (
-              <a className="new-id-document-preview" href={documentPreviewUrls[name]} target="_blank" rel="noreferrer">
-                {text('Preview PDF', 'የPDF ቅድመ እይታ')}
-              </a>
-            )}
+          )}
+          {isRenewalPhoto && (
+            <div className="new-id-camera">
+              {cameraOpen && <video ref={videoRef} autoPlay />}
+              <div className="new-id-camera-actions">
+                {!cameraOpen
+                  ? <button type="button" onClick={openCamera}>{text('Use Camera', 'ካሜራ ይጠቀሙ')}</button>
+                  : <button type="button" onClick={capture}>{text('Capture Photo', 'ፎቶ አንሳ')}</button>}
+                {webcamPhoto && (
+                  <span className="new-id-camera-status">
+                    {text('Photo captured successfully.', 'ፎቶው በተሳካ ሁኔታ ተነስቷል።')}
+                    <button type="button" className="new-id-remove-file" onClick={() => setWebcamPhoto(null)}>{text('Remove', 'አስወግድ')}</button>
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+        {name === 'passportPhoto' && photoPreviewUrl && <img className="new-id-photo-preview" src={photoPreviewUrl} alt={text('Selected ID photo preview', 'የተመረጠው ፎቶ ቅድመ እይታ')} />}
+        {isRenewalPhoto && !photoPreviewUrl && (
+          <div className="new-id-renewal-photo-placeholder" aria-hidden="true">
+            {text('Photo preview', 'የፎቶ ቅድመ እይታ')}
           </div>
         )}
-        {name === 'passportPhoto' && photoPreviewUrl && <img className="new-id-photo-preview" src={photoPreviewUrl} alt="Selected ID photo preview" />}
-        {name === 'passportPhoto' && (
+        {name === 'passportPhoto' && !isRenewalPhoto && (
           <div className="new-id-camera">
             {cameraOpen && <video ref={videoRef} autoPlay />}
             <div className="new-id-camera-actions">
@@ -710,7 +773,7 @@ function NewIDApplicationForm() {
         }
       : {};
     return (
-      <div className="new-id-field-wrap">
+      <div className={`new-id-field-wrap new-id-field-wrap-${name}`}>
         <label className="new-id-field">
           {label}{required ? ' *' : ''}
           <input
@@ -738,18 +801,36 @@ function NewIDApplicationForm() {
             <div>
               <p className="new-id-eyebrow">{serviceType === 'ID_RENEWAL' ? text('ID RENEWAL', 'መታወቂያ እድሳት') : text('NEW NATIONAL ID', 'አዲስ ብሔራዊ መታወቂያ')}</p>
               <h1>{serviceType === 'ID_RENEWAL' ? text('ID Renewal Application', 'የመታወቂያ እድሳት ማመልከቻ') : text('New ID Card Application', 'አዲስ መታወቂያ ማመልከቻ')}</h1>
+              <p>{serviceType === 'ID_RENEWAL'
+                ? text('Provide your personal details and the documents required to renew your ID.', 'የግል መረጃዎንና ለመታወቂያ እድሳት የሚያስፈልጉ ሰነዶችን ያቅርቡ።')
+                : text('Complete the form below and upload clear supporting documents.', 'ከታች ያለውን ቅጽ ይሙሉና ግልጽ የድጋፍ ሰነዶችን ያያይዙ።')}</p>
             </div>
             <button type="button" className="new-id-language-toggle" onClick={() => toggleLanguage(isAmharic ? 'en' : 'am')} aria-label={text('Switch to Amharic', 'ወደ እንግሊዝኛ ቀይር')}>
               <span aria-hidden="true">🌐</span> {text('አማርኛ', 'English')}
             </button>
           </div>
-          <p>{serviceType === 'ID_RENEWAL'
-            ? text('Provide your personal details and the documents required to renew your ID.', 'የግል መረጃዎንና ለመታወቂያ እድሳት የሚያስፈልጉ ሰነዶችን ያቅርቡ።')
-            : text('Complete the form below and upload clear supporting documents.', 'ከታች ያለውን ቅጽ ይሙሉና ግልጽ የድጋፍ ሰነዶችን ያያይዙ።')}</p>
         </header>
         {message && <div className={`new-id-message is-${messageType}`} role={messageType === 'error' ? 'alert' : 'status'}>{message}</div>}
-        <form onSubmit={submit} className="new-id-form">
-          <fieldset>
+        {usesWizard && (
+          <ol className="new-id-stepper" aria-label={text('Application steps', 'የማመልከቻ ደረጃዎች')}>
+            {[
+              text('Personal information', 'የግል መረጃ'),
+              text('Address & emergency', 'አድራሻ እና የአደጋ ጊዜ ተጠሪ'),
+              text('Documents & submit', 'ሰነዶች እና ማስገባት')
+            ].map((stepLabel, index) => (
+              <li
+                key={stepLabel}
+                className={`new-id-stepper-step${wizardStep === index ? ' is-current' : ''}${wizardStep > index ? ' is-complete' : ''}`}
+                aria-current={wizardStep === index ? 'step' : undefined}
+              >
+                <span className="new-id-stepper-number" aria-hidden="true">{wizardStep > index ? '✓' : index + 1}</span>
+                <span>{stepLabel}</span>
+              </li>
+            ))}
+          </ol>
+        )}
+        <form ref={formRef} onSubmit={submit} className="new-id-form">
+          {(!usesWizard || wizardStep === 0) && <fieldset className={serviceType === 'ID_RENEWAL' ? `new-id-renewal-fieldset${form.renewalReason === 'EXPIRED' ? ' is-expired' : ''}` : undefined}>
             <legend>{text('Personal Information', 'የግል መረጃ')}</legend>
             <div className="new-id-grid">
               {field('firstName', text('First Name', 'ስም'), 'text', true, { pattern: NAME_PATTERN, minLength: 3, title: text('Use English/Amharic letters and spaces only.', 'የእንግሊዝኛ/አማርኛ ፊደልና ክፍተት ብቻ ይጠቀሙ።') })}
@@ -803,15 +884,15 @@ function NewIDApplicationForm() {
                 </p>
               )}
             </div>
-          </fieldset>
-          {serviceType === 'NEW_ID_CARD' && <fieldset>
+          </fieldset>}
+          {serviceType === 'NEW_ID_CARD' && (!usesWizard || wizardStep === 1) && <fieldset>
             <legend>{text('Emergency Contact', 'የአደጋ ጊዜ ተጠሪ')}</legend>
             <div className="new-id-grid">
               {field('emergencyContactName', text('Contact Full Name', 'የተጠሪ ሙሉ ስም'))}
               {field('emergencyPhone', text('Emergency Phone', 'የአደጋ ጊዜ ስልክ'), 'tel', false, { placeholder: '0912345678', inputMode: 'numeric', maxLength: 10, pattern: '0[79][0-9]{8}' })}
             </div>
           </fieldset>}
-          {serviceType === 'NEW_ID_CARD' && <fieldset>
+          {serviceType === 'NEW_ID_CARD' && (!usesWizard || wizardStep === 1) && <fieldset>
             <legend>{text('Address Information', 'የአድራሻ መረጃ')}</legend>
             <label className="new-id-same-address">
               <input type="checkbox" checked={sameAsBirthPlace} onChange={toggleSameAsBirthPlace} />
@@ -825,7 +906,7 @@ function NewIDApplicationForm() {
               {field('residenceAddress', text('Residence Address', 'የመኖሪያ አድራሻ'))}
             </div>
           </fieldset>}
-          {serviceType === 'NEW_ID_CARD' && <fieldset>
+          {serviceType === 'NEW_ID_CARD' && (!usesWizard || wizardStep === 1) && <fieldset className="new-id-administrative-details">
             <legend>{text('Administrative & Validity Details', 'የሰነድ አሰጣጥ መረጃ')}</legend>
             <div className="new-id-grid">
               {field('dateOfIssuance', text('Date of Issuance', 'የተሰጠበት ቀን'), 'date')}
@@ -833,7 +914,7 @@ function NewIDApplicationForm() {
               {field('issuedBy', text('Issued By (Admin Name/ID)', 'የሰጠው አካል (ስም/መታወቂያ)'))}
             </div>
           </fieldset>}
-          <fieldset>
+          {(!usesWizard || wizardStep === 2) && <fieldset>
             <legend>{text('Required Documents', 'አስፈላጊ ሰነዶች')}</legend>
             <p className="new-id-hint">{text('JPG, PNG, or PDF files only. Maximum 5MB per file.', 'JPG፣ PNG ወይም PDF ብቻ። የእያንዳንዱ ፋይል መጠን እስከ 5MB ነው።')}</p>
             {serviceType === 'NEW_ID_CARD' && (
@@ -873,8 +954,8 @@ function NewIDApplicationForm() {
               )}
             </div>
             {serviceType === 'NEW_ID_CARD' && <p className="new-id-hint">{text('For a new ID, upload both the birth certificate and either residence proof or housing proof.', 'ለአዲስ መታወቂያ የልደት ምስክር ወረቀትና ከመኖሪያ/ቤት ማስረጃ አንዱን ያስገቡ።')}</p>}
-          </fieldset>
-          {serviceType === 'NEW_ID_CARD' && isTransfer && (
+          </fieldset>}
+          {serviceType === 'NEW_ID_CARD' && (!usesWizard || wizardStep === 2) && isTransfer && (
             <fieldset>
               <legend>{text('Transfer Documents', 'የዝውውር ሰነዶች')}</legend>
               <p className="new-id-hint">{text('Attach these only if they apply to your transfer.', 'ለዝውውርዎ አስፈላጊ ከሆኑ ብቻ ያያይዙ።')}</p>
@@ -883,23 +964,34 @@ function NewIDApplicationForm() {
               </div>
             </fieldset>
           )}
-          {serviceType === 'NEW_ID_CARD' && <details className="new-id-optional-documents">
+          {serviceType === 'NEW_ID_CARD' && (!usesWizard || wizardStep === 2) && <details className="new-id-optional-documents">
             <summary>{text('Optional Documents', 'አማራጭ ሰነዶች')}</summary>
             <p className="new-id-hint">{text('Add these only if they apply to your situation.', 'እነዚህን ሰነዶች ለሁኔታዎ አስፈላጊ ከሆኑ ብቻ ያያይዙ።')}</p>
             <div className="new-id-grid">
               {EXTRA_ID_DOCUMENTS.map(([fieldName, fieldLabel]) => upload(fieldName, optionLabel(fieldLabel), '.jpg,.jpeg,.png,.pdf'))}
             </div>
           </details>}
-          {serviceType === 'NEW_ID_CARD' && <fieldset>
+          {serviceType === 'NEW_ID_CARD' && (!usesWizard || wizardStep === 2) && <fieldset>
             <legend>{text('Additional Details', 'ተጨማሪ መረጃ')}</legend>
             <textarea name="details" value={form.details} onChange={change} rows="4" placeholder={text('Additional information', 'ተጨማሪ መረጃ')} />
           </fieldset>}
           <div className="new-id-actions">
+            {usesWizard && wizardStep > 0 && (
+              <button type="button" onClick={() => goToWizardStep(wizardStep - 1)} className="new-id-previous-button">
+                {text('Previous', 'ቀዳሚ')}
+              </button>
+            )}
             <button type="button" onClick={clear} className="clear-button">{text('Clear Form', 'ቅጹን አጽዳ')}</button>
-            <button type="submit" disabled={submitting} className="submit-button">
-              {submitting && <span className="new-id-submit-spinner" aria-hidden="true" />}
-              {submitting ? text('Submitting...', 'በመላክ ላይ...') : text('Submit Application', 'ማመልከቻ ላክ')}
-            </button>
+            {usesWizard && wizardStep < 2 ? (
+              <button type="button" onClick={() => goToWizardStep(wizardStep + 1)} className="submit-button">
+                {text('Next', 'ቀጣይ')}
+              </button>
+            ) : (
+              <button type="submit" disabled={submitting} className="submit-button">
+                {submitting && <span className="new-id-submit-spinner" aria-hidden="true" />}
+                {submitting ? text('Submitting...', 'በመላክ ላይ...') : text('Submit Application', 'ማመልከቻ ላክ')}
+              </button>
+            )}
           </div>
         </form>
       </main>
