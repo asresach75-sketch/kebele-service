@@ -63,7 +63,6 @@ app.use('/api/fees', feeRoutes);
 app.use('/api/vital', marriageRoutes);
 app.use('/api/birth-certificate', birthCertificateRoutes);
 app.use('/api/admin/audit-logs', auditRoutes);
-// applicationRoutes የሚለው ጠፍቷል ምክንያቱም ፋይሉ የለም፣ ሁሉም በ serviceRoutes በኩል ይስተናገዳል
 
 // የተፈቀደን ሰነድ ወይም ፒዲኤፍ ፋይል በዳውንሎድ ለማግኘት የሚያስችል ራውት
 const downloadDocument = async (req, res) => {
@@ -109,7 +108,7 @@ app.get('/api/health', (req, res) => {
 // ==========================================
 app.use(express.static(path.join(__dirname, '../frontend/build')));
 
-// የተስተካከለው የ RegEx ራውት (Express / Node v24 ተስማሚ)
+// ለየት ያለ ራውቲንግ (ከ /api ውጭ ያሉትን ጥያቄዎች ሁሉ ወደ ሬአክት index.html ይመራቸዋል)
 app.get(/^(?!\/api\/).*/, (req, res) => {
   res.sendFile(path.resolve(__dirname, '../frontend', 'build', 'index.html'));
 });
