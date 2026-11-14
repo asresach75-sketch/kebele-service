@@ -96,13 +96,22 @@ const downloadDocument = async (req, res) => {
 app.get('/api/downloads/:id', downloadDocument);
 app.get('/api/applications/download/:id', downloadDocument);
 
-app.get('/', (req, res) => {
-  res.send('API is running...');
-});
-
+// ==========================================
+// API HEALTH CHECK ROUTE
+// ==========================================
 app.get('/api/health', (req, res) => {
   const connected = mongoose.connection.readyState === 1;
   res.status(connected ? 200 : 503).json({ database: { connected } });
+});
+
+// ==========================================
+// SERVE FRONTEND STATIC BUILD FILES (PRODUCTION)
+// ==========================================
+app.use(express.static(path.join(__dirname, '../frontend/build')));
+
+// የተስተካከለው የ RegEx ራውት (Express / Node v24 ተስማሚ)
+app.get(/^(?!\/api\/).*/, (req, res) => {
+  res.sendFile(path.resolve(__dirname, '../frontend', 'build', 'index.html'));
 });
 
 const PORT = process.env.PORT || 5000;
@@ -146,7 +155,7 @@ app.use((err, req, res, next) => {
       ? 'File too large. Please upload files no larger than 5MB.'
       : err.code === 'LIMIT_UNEXPECTED_FILE'
         ? `Unexpected file field "${err.field}". Ensure the frontend and backend use matching upload field names.`
-      : err.message;
+        : err.message;
     return res.status(400).json({ success: false, message });
   }
   if (err.code === 'LIMIT_FILE_SIZE') {

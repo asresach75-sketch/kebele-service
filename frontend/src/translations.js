@@ -10,6 +10,11 @@ export const translations = {
   },
   am: {
     signupFullNamePlaceholder: 'ሙሉ ስም ያስገቡ', signupPasswordPlaceholder: 'የይለፍ ቃል ያስገቡ',
+    backHome: 'ወደ መነሻ ተመለስ', emailOrPhone: 'ኢሜይል ወይም ስልክ ቁጥር', password: 'የይለፍ ቃል',
+    signInTitle: 'ግባ', loginIntro: 'አገልግሎቶችን ለመጠቀም የመለያ መረጃዎን ያስገቡ።',
+    loginExample: 'ለምሳሌ፦ example@gmail.com ወይም 0911123456', forgotPassword: 'የይለፍ ቃል ረሱ?',
+    rememberMe: 'እኔን አስታውስ', loginSubmit: 'ግባ', loggingIn: 'በመግባት ላይ...',
+    signupPrompt: 'መለያ የለዎትም?', signup: 'ይመዝገቡ',
     portalTitle: 'የኢ-ቀበሌ ፖርታል', portalSubtitle: 'የዲጂታል ዜጎች አገልግሎት', navHome: 'መነሻ', navServices: 'አገልግሎቶች', navTrack: 'መከታተያ', navAbout: 'ስለ እኛ', navContact: 'እኛን ያግኙን', navDashboard: 'ዳሽቦርድ', login: 'ግባ', register: 'ተመዝገብ', logout: 'ውጣ', darkMode: 'ጨለማ ሁነታ', lightMode: 'የብርሃን ሁነታ',
     applyId: 'መታወቂያ ማውጣት', renewId: 'መታወቂያ ማደስ', vitalEvents: 'የሲቪል ክስተቶች', newId: 'አዲስ መታወቂያ', idRenewal: 'መታወቂያ ማደስ', birth: 'የልደት ምዝገባ', marriage: 'የጋብቻ ምዝገባ', divorce: 'የፍቺ ምዝገባ', death: 'የሞት ምዝገባ',
     maintenanceNotice: 'የጥገና ማስታወቂያ፡ በየእሑዱ ከሌሊቱ 8:00 እስከ 9:00 ሰዓት ሲስተሙ ለጥገና አገልግሎት አይሰጥም።',

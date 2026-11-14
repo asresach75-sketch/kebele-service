@@ -293,6 +293,7 @@
 
 .finance-notification-wrap {
 	position: relative;
+	z-index: 1000;
 }
 
 .finance-user .finance-notification-button {
@@ -334,7 +335,7 @@
 	position: absolute;
 	top: calc(100% + 10px);
 	right: 0;
-	z-index: 100;
+	z-index: 9999;
 	width: min(360px, calc(100vw - 32px));
 	max-height: min(65vh, 440px);
 	overflow: auto;
